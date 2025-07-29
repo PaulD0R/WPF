@@ -1,0 +1,44 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style TargetType="CheckBox"
+           x:Key="LikeButtonTheme">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Heart"
+                                Background="White"
+                                BorderThickness="0"
+                                Width="24"
+                                Height="24">
+                            <Border.Clip>
+                                <PathGeometry>
+                                    <PathFigure StartPoint="0,8">
+                                        <ArcSegment Point="12,8"
+                                                    Size="6,8"
+                                                    SweepDirection="Clockwise"/>
+
+                                        <ArcSegment Point="24,8"
+                                                    Size="6,8"
+                                                    SweepDirection="Clockwise"/>
+
+                                        <LineSegment Point="12, 24"/>
+
+                                        <LineSegment Point="0, 8"/>
+                                    </PathFigure>
+                                </PathGeometry>
+                            </Border.Clip>
+                        </Border>
+
+                            <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Heart" Property="Background" Value="Red"/>
+                                <Setter TargetName="Heart" Property="BorderBrush" Value="Transparent"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>

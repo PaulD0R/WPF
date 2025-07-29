@@ -1,0 +1,41 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+           TargetType="RadioButton"
+           x:Key="ChangeButtonTheme">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid VerticalAlignment="Stretch"
+                          HorizontalAlignment="Stretch">
+
+                            <Border Background="{TemplateBinding Background}"
+                                    Name="MainRect">
+                                <Border.Clip>
+                                    <RectangleGeometry RadiusX="15"
+                                                       RadiusY="15"
+                                                       Rect="0, 0, 200, 50"/>
+                                </Border.Clip>
+
+                                <TextBlock VerticalAlignment="Center"
+                                           Text="{TemplateBinding Property=Content}"
+                                           HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="MainRect" Property="Background" Value="#22002f"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>

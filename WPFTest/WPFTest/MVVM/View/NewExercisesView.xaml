@@ -1,0 +1,153 @@
+﻿<UserControl x:Class="WPFTest.MVVM.View.NewExercisesView"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPFTest.MVVM.View"
+             xmlns:behavior="clr-namespace:WPFTest.Behaviors"
+             xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="900">
+    <Grid Height="450"
+          MinWidth="795">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="Предмет"
+                   Foreground="White"
+                   FontSize="25"
+                   Margin="10"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right"
+                   Grid.Column="0"
+                   Grid.Row="0"/>
+
+        <TextBlock Text="Номер"
+                   Foreground="White"
+                   FontSize="25"
+                   Margin="10"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right"
+                   Grid.Column="0"
+                   Grid.Row="1"/>
+
+        <TextBlock Text="Задание"
+                   Foreground="White"
+                   FontSize="25"
+                   Margin="10"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right"
+                   Grid.Column="0"
+                   Grid.Row="2"/>
+
+        <TextBlock Text="Файл"
+                   Foreground="White"
+                   FontSize="25"
+                   Margin="10"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Right"
+                   Grid.Column="0"
+                   Grid.Row="3"/>
+
+        <StackPanel Grid.Column="1"
+                    Grid.Row="0"
+                    Margin="10"
+                    Orientation="Horizontal">
+            <ComboBox Background="#333540"
+                     BorderBrush="#333540"
+                     ItemsSource="{Binding Subjects}"
+                     DisplayMemberPath="Name"
+                     SelectedValuePath="Id"
+                     SelectedValue="{Binding SubjectId}"
+                     Foreground="Black"
+                     FontSize="25"
+                     MinWidth="370"
+                     HorizontalAlignment="Stretch"
+                     VerticalAlignment="Center"
+                     BorderThickness="0"/>
+
+            <Button Content="Добавить"
+                    Style="{StaticResource CircleButton}"
+                    Margin="20, 0, 0, 0"
+                    Command="{Binding NewSubjectViewCommand}"/>
+        </StackPanel>
+
+        <toolkit:IntegerUpDown Background="#333540"
+                 Value="{Binding Number}"
+                 Grid.Column="1"
+                 Grid.Row="1"
+                 Minimum="1"
+                 Increment="1"
+                 ShowButtonSpinner="False"
+                 Maximum="100"
+                 Foreground="White"
+                 FontSize="25"
+                 Margin="10"
+                 Width="80"
+                 HorizontalAlignment="Left"
+                 VerticalAlignment="Center"
+                 BorderThickness="0">
+            <i:Interaction.Behaviors>
+                <behavior:ValueChangedBehavior Command="{Binding NumberCommand}"/>
+            </i:Interaction.Behaviors>
+        </toolkit:IntegerUpDown>
+
+        <TextBox Background="#333540"
+                 Text="{Binding Task}"
+                 Grid.Column="1"
+                 Grid.Row="2"
+                 Foreground="White"
+                 FontSize="25"
+                 Margin="10"
+                 HorizontalAlignment="Stretch"
+                 VerticalAlignment="Stretch"
+                 TextWrapping="Wrap"
+                 AcceptsReturn="True"
+                 VerticalScrollBarVisibility="Hidden"
+                 BorderThickness="0">
+            <i:Interaction.Behaviors>
+                <behavior:TextChangedBehavior Command="{Binding TaskCommand}"/>
+            </i:Interaction.Behaviors>
+        </TextBox>
+
+        <Grid Grid.Column="1"
+            Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                Margin="10"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Style="{StaticResource CircleButton}" 
+                Content="Выбрать файл" 
+                Width="240" 
+                Height="40" 
+                Foreground="White"
+                Command="{Binding FileCommand}"/>
+
+            <Button Grid.Column="1"
+                Margin="10"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                Style="{StaticResource CircleButton}" 
+                Content="Сохранить" 
+                Width="120" 
+                Height="40" 
+                Foreground="White"
+                Command="{Binding SaveCommand}"/>
+        </Grid>
+    </Grid>
+</UserControl>

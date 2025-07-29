@@ -1,0 +1,130 @@
+﻿<UserControl x:Class="WPFTest.MVVM.View.ExerciseView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPFTest.MVVM.View"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:converter="clr-namespace:WPFTest.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="1450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </UserControl.Resources>
+    
+    <Border>
+        <ScrollViewer Visibility="{Binding IsLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"
+                    VerticalScrollBarVisibility="Hidden"
+                    HorizontalScrollBarVisibility="Hidden">
+            <StackPanel Orientation="Vertical"
+                        HorizontalAlignment="Left">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Image Height="400"
+                           Width="300"
+                           Grid.Column="0"
+                           Source="/Images/NotFound.png"
+                           Margin="30"/>
+
+                    <StackPanel Orientation="Vertical"
+                                HorizontalAlignment="Left"
+                                Margin="30"
+                                Grid.Column="1">
+                        <Border Background="#333540"
+                                CornerRadius="10"
+                                VerticalAlignment="Center">
+                            
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <i:InvokeCommandAction Command="{Binding SubjectViewCommand}"
+                                                           CommandParameter="{Binding SubjectId}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="20, 0, 0, 0">
+                                <StackPanel Orientation="Vertical">
+                                    <TextBlock Text="Предмет"
+                                               FontSize="10"
+                                               Foreground="White"
+                                               Margin="5, 5, 0, 0"/>
+
+                                    <TextBlock Text="{Binding Subject}"
+                                               FontSize="25"
+                                               Foreground="White"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Vertical"
+                                            Margin="40, 0, 0, 0">
+                                    <TextBlock Text="Курс"
+                                               FontSize="10"
+                                               Foreground="White"
+                                               Margin="5, 5, 20, 0"/>
+
+                                    <TextBlock Text="{Binding Year}"
+                                               FontSize="25"
+                                               Foreground="White"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Номер"
+                                   FontSize="10"
+                                   Foreground="White"
+                                   Margin="5, 20, 0, 0"/>
+                        
+                        <TextBlock Text="{Binding Number}"
+                                   FontSize="25"
+                                   Foreground="White"
+                                   TextWrapping="Wrap"/>
+                        
+                        <TextBlock Text="Задание"
+                                   FontSize="10"
+                                   Foreground="White"
+                                   Margin="5, 20, 0, 0"/>
+                        
+                        <TextBlock Text="{Binding Task}"
+                                   FontSize="25"
+                                   Foreground="White"
+                                   TextWrapping="Wrap"/>
+
+                        <Button Content="Скачать"
+                                Style="{StaticResource CircleButton}"
+                                Margin="20"
+                                Command="{Binding LoadTasksFileCommand}"/>
+
+                        <Border HorizontalAlignment="Stretch"
+                                Margin="10"
+                                CornerRadius="15"
+                                Background="#333540">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsLiked}"
+                                         Style="{StaticResource LikeButtonTheme}"
+                                         Command="{Binding ChangeIsLikedCommand}"
+                                         CommandParameter="{Binding Id}"
+                                          Margin="10, 0, 0, 0"/>
+                                
+                                <TextBlock Text="{Binding LikesCount}"
+                                           FontSize="25"
+                                           Foreground="White"
+                                           VerticalAlignment="Center"
+                                           Margin="5, 0, 0, 0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+                
+                <TextBlock Text="Сдесь будут коментарии"
+                       FontSize="20"
+                       Foreground="White"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

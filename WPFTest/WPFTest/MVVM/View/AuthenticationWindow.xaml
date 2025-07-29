@@ -1,0 +1,43 @@
+﻿<Window x:Class="WPFTest.MVVM.ViewModel.AuthenticationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPFTest.MVVM.ViewModel"
+        mc:Ignorable="d"
+        Title="AuthenticationWindow" Height="400" Width="400"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent">
+    <Border Background="#272537"
+            CornerRadius="15">
+        <StackPanel Orientation="Vertical">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <RadioButton Grid.Column="0"
+                             Content="Регистрация"
+                             Foreground="White"
+                             FontSize="30"
+                             IsChecked="True"
+                             Style="{StaticResource ChangeButtonTheme}"
+                             Height="50"
+                             Command="{Binding SigninCommand}"/>
+                <RadioButton Grid.Column="1"
+                             Content="Вход"
+                             Foreground="White"
+                             FontSize="30"
+                             Style="{StaticResource ChangeButtonTheme}"
+                             Command="{Binding SignupCommand}"/>
+            </Grid>
+
+            <ContentControl VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                            Content="{Binding CurentView}"/>
+        </StackPanel>
+    </Border>
+</Window>
