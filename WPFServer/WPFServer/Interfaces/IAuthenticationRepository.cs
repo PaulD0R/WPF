@@ -4,6 +4,6 @@ namespace WPFServer.Interfaces
 {
     public interface IAuthenticationRepository
     {
-        public string CreateJwt(Person person);
+        public Task<string> CreateJwtAsync(Person person);
     }
 }

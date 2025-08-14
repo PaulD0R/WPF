@@ -81,6 +81,7 @@ namespace WPFServer.Controllers
         }
 
         [HttpPost("Add")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Add([FromBody] NewExerciseRequest request)
         {
             var exercise = request.ToExercise();

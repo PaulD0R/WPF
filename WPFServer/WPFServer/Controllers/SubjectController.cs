@@ -42,6 +42,7 @@ namespace WPFServer.Controllers
         }
 
         [HttpPost("Add")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddSubject([FromBody] NewSubjectRequest subjectRequest)
         {
             var subject = subjectRequest.ToSubject();

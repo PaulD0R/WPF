@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 using WPFServer.Data;
 using WPFServer.Models;
 
@@ -28,5 +30,44 @@ namespace WPFServer.Context
             options.UseSqlServer(StaticData.CONNECTION_STRING);
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {   
+            const string ADMIN_ID = "B9C6AA99-E98D-4E3D-87DE-C93E17592919";
+            const string USER_ID = "19EF95CD-413A-49EA-B4F1-448E9D86D81C";
+
+            base.OnModelCreating(builder);
+
+            builder.Entity<Exercise>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.Subject)
+                    .WithMany(s => s.Exercises)
+                    .HasForeignKey(e => e.SubjectId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(e => e.Persons)
+                    .WithMany(p => p.Exercises);
+            });
+
+            List<IdentityRole> roles =
+            [
+                new IdentityRole
+                {   
+                    Id = Guid.Parse(ADMIN_ID).ToString(),
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                },
+
+                new IdentityRole
+                {
+                    Id = Guid.Parse(USER_ID).ToString(),
+                    Name = "User",
+                    NormalizedName = "USER"
+                }
+            ];
+
+            builder.Entity<IdentityRole>().HasData(roles);
+        }
     }
 }

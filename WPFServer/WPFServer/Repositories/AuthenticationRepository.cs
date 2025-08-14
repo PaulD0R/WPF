@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -8,15 +9,24 @@ using WPFServer.Models;
 
 namespace WPFServer.Repositories
 {
-    public class AuthenticationRepository : IAuthenticationRepository
+    public class AuthenticationRepository(UserManager<Person> userManager) : IAuthenticationRepository
     {
-        public string CreateJwt(Person person)
+        private readonly UserManager<Person> _userManager = userManager;
+
+        public async Task<string> CreateJwtAsync(Person person)
         {
+            var roles = await _userManager.GetRolesAsync(person);
             var claims = new List<Claim> 
             { 
                 new Claim(JwtRegisteredClaimNames.GivenName, person.UserName),
                 new Claim(JwtRegisteredClaimNames.Email, person.Email)
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var jwt = new JwtSecurityToken(
                     issuer: StaticData.ISSURE,
                     audience: StaticData.AUDIENCE,

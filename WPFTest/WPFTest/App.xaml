@@ -49,6 +49,10 @@
                 <view:SubjectView/>
             </DataTemplate>
 
+            <DataTemplate DataType="{x:Type viewModel:PersonViewModel}">
+                <view:PersonView/>
+            </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

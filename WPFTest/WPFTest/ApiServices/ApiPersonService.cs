@@ -35,7 +35,20 @@ namespace WPFTest.ApiServices
         public async Task<FullPerson?> GetPersonById(string id)
         {
             FullPerson? person = null;
-            var response = await _httpClient.GetAsync($"{id}");
+            var response = await _httpClient.GetAsync($"Id/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                person = await response.Content.ReadAsAsync<FullPerson>();
+            }
+
+            return person;
+        }
+
+        public async Task<FullPerson?> GetPersonByName(string name)
+        {
+            FullPerson? person = null;
+            var response = await _httpClient.GetAsync($"Name/{name}");
 
             if (response.IsSuccessStatusCode)
             {

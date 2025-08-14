@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WPFServer.DTOs.Person;
 using WPFServer.DTOs.PersonsFiles;
 using WPFServer.Extensions;
 using WPFServer.Extensions.Mappers;
@@ -21,7 +22,7 @@ namespace WPFServer.Controllers
             _personsFilesRepository = personsFilesRepository;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("Id/{id}")]
         public async Task<IActionResult> GetPersonById([FromRoute] string id)
         {
             var person = await _personRepository.GetByIdAsync(id);
@@ -29,6 +30,47 @@ namespace WPFServer.Controllers
             if (person  == null) return NotFound();
 
             return Ok(person.ToFullPersonDto());
+        }
+
+        [HttpPatch("Id/{id}/AddRole")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AddRoleById([FromRoute] string id, [FromBody] RoleRequestcs role)
+        {
+            var result = await _personRepository.AddRoleByIdAsync(id, role?.Role ?? string.Empty);
+
+            if (!result) return NotFound();
+
+            return Ok();
+        }
+
+        [HttpGet("Name/{name}")]
+        public async Task<ActionResult> GetByName([FromRoute] string name)
+        {
+            var privatePersonUserName = User.GetUserName();
+
+            if (privatePersonUserName == null) return Unauthorized();
+
+            var privatePerson = await _personRepository.GetByNameAsync(privatePersonUserName);
+            var person = await _personRepository.GetByNameAsync(name);
+
+            if (person == null) return NotFound();
+
+            var personDto = person.ToFullPersonDto();
+
+            foreach (var exercise in personDto.Exercises)
+            {
+                exercise.IsLiked = await _personRepository.GetIsLikedByIdAsync(privatePerson.Id, exercise.Id);
+            }
+
+            return Ok(personDto);
+        }
+
+        [HttpGet("Name/{name}/Similar")]
+        public async Task<ActionResult> GetByNameSimilar([FromRoute] string name)
+        {
+            var persons = await _personRepository.GetByNameSimilarsAsync(name);
+
+            return Ok(persons.Select(x => x.ToLightPersonDto()));
         }
 
         [HttpGet("Me")]
@@ -52,7 +94,7 @@ namespace WPFServer.Controllers
 
             if (name == null) return Unauthorized();
 
-            var isLiked = await _personRepository.GetIsLikedById(name, exerciseId);
+            var isLiked = await _personRepository.GetIsLikedByIdAsync(name, exerciseId);
 
             if (isLiked == null) return NotFound();
 

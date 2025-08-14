@@ -17,7 +17,7 @@ namespace WPFServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -34,7 +34,7 @@ namespace WPFServer.Migrations
 
                     b.HasIndex("PersonsId");
 
-                    b.ToTable("ExercisePerson");
+                    b.ToTable("ExercisePerson", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -62,6 +62,20 @@ namespace WPFServer.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "b9c6aa99-e98d-4e3d-87de-c93e17592919",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "19ef95cd-413a-49ea-b4f1-448e9d86d81c",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -259,7 +273,8 @@ namespace WPFServer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Task")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 
@@ -322,10 +337,13 @@ namespace WPFServer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("Year")
                         .HasColumnType("int");
@@ -434,7 +452,8 @@ namespace WPFServer.Migrations
                 {
                     b.HasOne("WPFServer.Models.Person", "Person")
                         .WithOne("Files")
-                        .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId");
+                        .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Person");
                 });

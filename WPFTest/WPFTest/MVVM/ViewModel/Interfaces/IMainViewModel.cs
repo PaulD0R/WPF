@@ -3,5 +3,6 @@
     public interface IMainViewModel
     {
         public void ChangeCurrentView(object currentView);
+        void LoadRoles();
     }
 }

@@ -48,7 +48,9 @@ namespace WPFTest
                 new ApiPersonService(StaticData.PERSON_ROUDE)
             );
 
+            //Services
             services.AddTransient<INavigationService, NavigationService>();
+            services.AddTransient<IJwtService, JwtService>();
 
             //ViewModels
             services.AddSingleton<IHomeViewModel, HomeViewModel>();
@@ -61,6 +63,7 @@ namespace WPFTest
             services.AddSingleton<ISigninViewModel, SigninViewModel>(); 
             services.AddScoped<IExerciseViewModel, ExerciseViewModel>();
             services.AddSingleton<ISubjectViewModel, SubjectViewModel>();
+            services.AddSingleton<IPersonViewModel, PersonViewModel>();
 
             //Lazy ViewModels
             services.AddSingleton(provider =>
@@ -84,6 +87,9 @@ namespace WPFTest
             services.AddSingleton(provider =>
                 new Lazy<IMainViewModel>(() => provider.GetRequiredService<IMainViewModel>())
             );
+            services.AddSingleton(provider =>
+                new Lazy<IPersonViewModel>(() => provider.GetRequiredService<IPersonViewModel>())
+            );
 
             //View
             services.AddTransient<HomeView>();
@@ -96,6 +102,7 @@ namespace WPFTest
             services.AddTransient<SignupView>();
             services.AddTransient<ExerciseView>();
             services.AddTransient<SubjectView>();
+            services.AddTransient<PersonView>();
         }
     }
 }

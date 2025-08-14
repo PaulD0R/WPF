@@ -12,18 +12,33 @@ using WPFServer.Context;
 namespace WPFServer.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250726091344_PersonsFilesDb")]
-    partial class PersonsFilesDb
+    [Migration("20250813125248_addRoles19")]
+    partial class addRoles19
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.7")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("ExercisePerson", b =>
+                {
+                    b.Property<int>("ExercisesId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PersonsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ExercisesId", "PersonsId");
+
+                    b.HasIndex("PersonsId");
+
+                    b.ToTable("ExercisePerson", (string)null);
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -50,6 +65,20 @@ namespace WPFServer.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "b9c6aa99-e98d-4e3d-87de-c93e17592919",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "19ef95cd-413a-49ea-b4f1-448e9d86d81c",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -247,7 +276,8 @@ namespace WPFServer.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Task")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 
@@ -310,10 +340,13 @@ namespace WPFServer.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("Year")
                         .HasColumnType("int");
@@ -328,6 +361,21 @@ namespace WPFServer.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.HasDiscriminator().HasValue("Person");
+                });
+
+            modelBuilder.Entity("ExercisePerson", b =>
+                {
+                    b.HasOne("WPFServer.Models.Exercise", null)
+                        .WithMany()
+                        .HasForeignKey("ExercisesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WPFServer.Models.Person", null)
+                        .WithMany()
+                        .HasForeignKey("PersonsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -407,7 +455,8 @@ namespace WPFServer.Migrations
                 {
                     b.HasOne("WPFServer.Models.Person", "Person")
                         .WithOne("Files")
-                        .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId");
+                        .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Person");
                 });

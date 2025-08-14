@@ -36,7 +36,7 @@ namespace WPFServer.Controllers
             var result = await _signInManager.CheckPasswordSignInAsync(person, signinRequest.Password, false);
             if (!result.Succeeded) return Unauthorized("Invalid Password");
 
-            var token = _authenticationRepository.CreateJwt(person);
+            var token = await _authenticationRepository.CreateJwtAsync(person);
 
             return Ok(person.ToPersonDto(token));
         }
@@ -49,11 +49,16 @@ namespace WPFServer.Controllers
 
             if (createPerson.Succeeded)
             {
-                var token = _authenticationRepository.CreateJwt(person);
+                var roleResult = await _userManager.AddToRoleAsync(person, "User");
 
-                await _personsFilesRepository.CreateNewAsync(person.Id);
+                if (roleResult.Succeeded)
+                {
+                    var token = await _authenticationRepository.CreateJwtAsync(person);
 
-                return Ok(person.ToPersonDto(token));
+                    await _personsFilesRepository.CreateNewAsync(person.Id);
+
+                    return Ok(person.ToPersonDto(token));
+                }
             }
 
             return StatusCode(500, createPerson.Errors);

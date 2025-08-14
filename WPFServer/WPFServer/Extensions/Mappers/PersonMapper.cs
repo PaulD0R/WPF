@@ -51,7 +51,7 @@ namespace WPFServer.Extensions.Mappers
                 Id = person.Id,
                 Name = person.UserName,
                 Image = person.Files?.Image,
-                Exercises = person.Exercises?.Select(x => x.ToExerciseDto(true)).ToList()
+                Exercises = person.Exercises?.Select(x => x.ToExerciseDto(false)).ToList()
             };
         }
 

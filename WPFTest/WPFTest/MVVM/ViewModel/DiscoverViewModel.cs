@@ -12,6 +12,7 @@ namespace WPFTest.MVVM.ViewModel
     public class DiscoverViewModel : ObserverItem, IDiscoverViewModel
     {
         private readonly ApiExerciseService _exerciseService;
+
         private readonly IMainViewModel _mainViewModel;
         private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
 
