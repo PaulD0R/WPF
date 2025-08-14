@@ -1,8 +1,6 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
-using WPFTest.MVVM.Model.Exercise;
-using WPFTest.MVVM.Model.Files;
 using WPFTest.MVVM.Model.Subject;
 using WPFTest.MVVM.ViewModel.Interfaces;
 

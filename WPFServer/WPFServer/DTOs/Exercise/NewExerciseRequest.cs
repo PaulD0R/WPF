@@ -1,5 +1,4 @@
 ﻿using WPFServer.DTOs.ExercisesFiles;
-using WPFServer.Models;
 
 namespace WPFServer.DTOs.Exercise
 {

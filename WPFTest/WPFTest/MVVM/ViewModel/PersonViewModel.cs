@@ -2,9 +2,7 @@
 using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
-using WPFTest.FileStreamers;
 using WPFTest.MVVM.Model.Exercise;
-using WPFTest.MVVM.Model.Files;
 using WPFTest.MVVM.ViewModel.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
@@ -80,7 +78,7 @@ namespace WPFTest.MVVM.ViewModel
 
         public async void LoadPerson(string name)
         {
-            var person = await _personService.GetPersonByName(name);
+            var person = await _personService.GetPersonByNameAsync(name);
 
             if (person == null)
             {

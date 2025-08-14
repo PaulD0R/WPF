@@ -37,7 +37,8 @@ namespace WPFServer.Extensions.Mappers
             {
                 Number = exerciseRequest.Number,
                 Task = exerciseRequest.Task,
-                SubjectId = exerciseRequest.SubjectId
+                SubjectId = exerciseRequest.SubjectId,
+                Comments = []
             };
         }
 
@@ -61,7 +62,8 @@ namespace WPFServer.Extensions.Mappers
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
                 Subject = exercise.Subject?.ToLightSubjectDto(),
-                IsLiked = isLiked
+                IsLiked = isLiked,
+                Comments = exercise.Comments?.Select(x => x.ToCommentDto()).ToList()
             };
         }
 
@@ -74,7 +76,8 @@ namespace WPFServer.Extensions.Mappers
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
                 Subject = exercise.Subject?.ToLightSubjectDto(),
-                IsLiked = exercise.Persons?.Any(p => p.UserName == userName) ?? false
+                IsLiked = exercise.Persons?.Any(p => p.UserName == userName) ?? false,
+                Comments = exercise.Comments?.Select(x => x.ToCommentDto()).ToList()
             };
         }
     }

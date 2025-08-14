@@ -1,5 +1,4 @@
 ﻿using System.Net.Http;
-using WPFTest.Data;
 using WPFTest.MVVM.Model.Person;
 
 namespace WPFTest.ApiServices

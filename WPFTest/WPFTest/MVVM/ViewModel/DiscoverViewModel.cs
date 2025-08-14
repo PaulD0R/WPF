@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using WPFTest.Data;
 using System.Windows.Input;
-using WPFTest.FileStreamers;
 using WPFTest.ApiServices;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.MVVM.Model.Exercise;

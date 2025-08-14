@@ -1,6 +1,4 @@
-﻿using WPFServer.Models;
-
-namespace WPFServer.DTOs.Exercise
+﻿namespace WPFServer.DTOs.Exercise
 {
     public class ExerciseRequest
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WPFTest.MVVM.Model.Subject
+﻿namespace WPFTest.MVVM.Model.Subject
 {
     public class LightSubject
     {

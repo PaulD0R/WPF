@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace WPFServer.Models
+﻿namespace WPFServer.Models
 {
     public class Exercise
     {
@@ -11,5 +9,6 @@ namespace WPFServer.Models
         public int SubjectId { get; set; }
         public Subject? Subject { get; set; }
         public ICollection<Person>? Persons { get; set; }
+        public ICollection<Comment>? Comments {  get; set; }
     }
 }

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WPFTest.MVVM.Model.Files
+﻿namespace WPFTest.MVVM.Model.Files
 {
     public class ExercisesTasksFile
     {

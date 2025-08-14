@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using WPFTest.Data;
+using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.Model.Data;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.Model.Files;
@@ -102,6 +103,31 @@ namespace WPFTest.ApiServices
 
             var likesCount = await response.Content.ReadAsAsync<ExerciseState>();
             return likesCount;
+        }
+
+        public async Task<bool> AddCommentAsync(int id, NewComment comment) 
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{id}/Comments/Add", comment);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public async Task<ICollection<FullComment>?> GetCommentsByIdAsync(int id)
+        {
+            List<FullComment>? comments = null;
+            var response = await _httpClient.GetAsync($"{id}/Comments");
+
+            if (response.IsSuccessStatusCode)
+            {
+                comments = await response.Content.ReadAsAsync<List<FullComment>>();
+            }
+
+            return comments;
         }
 
         public void Dispose()

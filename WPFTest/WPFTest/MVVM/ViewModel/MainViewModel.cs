@@ -1,7 +1,5 @@
-﻿using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using System.Windows.Media;
-using WPFTest.ApiServices;
 using WPFTest.Core;
 using WPFTest.Data;
 using WPFTest.MVVM.ViewModel.Interfaces;

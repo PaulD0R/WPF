@@ -1,4 +1,5 @@
-﻿using WPFServer.DTOs.Subject;
+﻿using WPFServer.DTOs.Comment;
+using WPFServer.DTOs.Subject;
 
 namespace WPFServer.DTOs.Exercise
 {
@@ -10,5 +11,6 @@ namespace WPFServer.DTOs.Exercise
         public int SubjectId { get; set; }
         public LightSubjectDto? Subject { get; set; }
         public bool IsLiked { get; set; }
+        public ICollection<CommentDto>? Comments { get; set; }
     }
 }

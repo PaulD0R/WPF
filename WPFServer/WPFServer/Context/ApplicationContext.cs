@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 using WPFServer.Data;
 using WPFServer.Models;
 
@@ -14,6 +13,7 @@ namespace WPFServer.Context
         public DbSet<ExercisesFiles> ExercisesFiles { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<PersonsFiles> PersonsFiles { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)

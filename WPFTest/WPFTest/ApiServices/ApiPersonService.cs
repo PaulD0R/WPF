@@ -1,5 +1,7 @@
-﻿using System.Net.Http;
+﻿using Azure;
+using System.Net.Http;
 using WPFTest.Data;
+using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.Model.Data;
 using WPFTest.MVVM.Model.Files;
 using WPFTest.MVVM.Model.Person;
@@ -19,7 +21,7 @@ namespace WPFTest.ApiServices
             _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + StaticData.TOKEN);
         }
 
-        public async Task<PrivatePerson?> GetPrivate()
+        public async Task<PrivatePerson?> GetPrivateAsync()
         {
             PrivatePerson? person = null;
             var response = await _httpClient.GetAsync("Me");
@@ -32,7 +34,7 @@ namespace WPFTest.ApiServices
             return person;
         }
 
-        public async Task<FullPerson?> GetPersonById(string id)
+        public async Task<FullPerson?> GetPersonByIdAsync(string id)
         {
             FullPerson? person = null;
             var response = await _httpClient.GetAsync($"Id/{id}");
@@ -45,7 +47,7 @@ namespace WPFTest.ApiServices
             return person;
         }
 
-        public async Task<FullPerson?> GetPersonByName(string name)
+        public async Task<FullPerson?> GetPersonByNameAsync(string name)
         {
             FullPerson? person = null;
             var response = await _httpClient.GetAsync($"Name/{name}");
@@ -71,7 +73,7 @@ namespace WPFTest.ApiServices
             return personData.IsLiked;
         }
 
-        public async Task<ImageNewFile?> ChangePrivateImage(ImageNewFile newImage)
+        public async Task<ImageNewFile?> ChangePrivateImageAsync(ImageNewFile newImage)
         {
             ImageNewFile? image = null;
             var response = await _httpClient.PutAsJsonAsync("Me/Image/Change", newImage);
@@ -84,9 +86,21 @@ namespace WPFTest.ApiServices
             return image;
         }
 
-        public async Task<bool> DeletePrivateImage()
+        public async Task<bool> DeletePrivateImageAsync()
         {
             var response = await _httpClient.DeleteAsync("Me/Image/Delete");
+
+            if (response.IsSuccessStatusCode)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeleteCommentAsync(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"Me/Comments/Delete/{id}");
 
             if (response.IsSuccessStatusCode)
             {

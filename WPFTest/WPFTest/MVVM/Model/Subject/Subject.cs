@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WPFTest.MVVM.Model.Exercise;
+﻿using WPFTest.MVVM.Model.Exercise;
 
 namespace WPFTest.MVVM.Model.Subject
 {

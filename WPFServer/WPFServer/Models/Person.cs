@@ -6,5 +6,6 @@ namespace WPFServer.Models
     {
         public PersonsFiles? Files { get; set; }
         public ICollection<Exercise>? Exercises { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
     }
 }

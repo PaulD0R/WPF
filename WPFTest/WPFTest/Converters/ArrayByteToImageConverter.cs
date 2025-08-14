@@ -10,7 +10,7 @@ namespace WPFTest.Converters
         private static readonly string DefaultImagePath =
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "NotFound.png");
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is byte[] byteArray && byteArray.Length > 0)
             {
@@ -29,10 +29,9 @@ namespace WPFTest.Converters
             return LoadDefaultImage();
         }
 
-        private BitmapImage LoadDefaultImage()
+        private BitmapImage? LoadDefaultImage()
         {
-            if (!File.Exists(DefaultImagePath))
-                return null;
+            if (!File.Exists(DefaultImagePath)) return null;
 
             try
             {

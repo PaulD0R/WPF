@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
-using WPFServer.DTOs.Person;
+﻿using WPFServer.DTOs.Person;
 using WPFServer.Models;
 
 namespace WPFServer.Extensions.Mappers

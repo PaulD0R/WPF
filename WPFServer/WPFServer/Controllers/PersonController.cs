@@ -133,5 +133,28 @@ namespace WPFServer.Controllers
 
             return Ok();
         }
+
+        [HttpGet("Me/Comments")]
+        public async Task<IActionResult> GetComments()
+        {
+            var userName = User.GetUserName();
+
+            if (userName == null) return Unauthorized();
+
+            var comments = await _personRepository.GetCommentsByNameAsync(userName);
+            return Ok(comments?.Select(x => x.ToCommentDto()));
+        }
+
+        [HttpDelete("Me/Comments/Delete/{commentId:int}")]
+        public async Task<IActionResult> DeleteComment([FromRoute] int commentId)
+        {
+            var userName = User.GetUserName();
+
+            if (userName == null) return Unauthorized();
+            if (!await _personRepository.DeleteCommentByIdAsync(userName, commentId)) return BadRequest();
+
+            return NoContent();
+
+        }
     }
 }

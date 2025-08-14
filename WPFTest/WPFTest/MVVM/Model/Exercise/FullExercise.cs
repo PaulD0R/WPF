@@ -1,4 +1,5 @@
-﻿using WPFTest.MVVM.Model.Subject;
+﻿using WPFTest.MVVM.Model.Comments;
+using WPFTest.MVVM.Model.Subject;
 
 namespace WPFTest.MVVM.Model.Exercise
 {
@@ -10,5 +11,6 @@ namespace WPFTest.MVVM.Model.Exercise
         public int SubjectId { get; set; }
         public LightSubject? Subject { get; set; }
         public bool? IsLiked { get; set; }
+        public ICollection<FullComment>? Comments { get; set; }
     }
 }

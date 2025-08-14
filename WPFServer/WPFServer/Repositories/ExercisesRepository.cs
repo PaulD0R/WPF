@@ -19,7 +19,7 @@ namespace WPFServer.Repositories
 
         public async Task<Exercise?> GetByIdAsync(int id)
         {
-            return await _context.Exercises.Include(x => x.Subject).Include(x => x.Persons).FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.Exercises.Include(x => x.Subject).Include(x => x.Persons).Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<bool> DeleteAsync(int id)

@@ -15,6 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
+builder.WebHost.ConfigureKestrel(options => 
+    options.Limits.MaxRequestBodySize = StaticData.MAX_REQUEST_SIZE);
+
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=WPF;Trusted_Connection=True;"));
 
@@ -55,6 +58,7 @@ builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IPersonsFilesRepository, PersonsFilesRepository>();
+builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 
 builder.Services.AddCors(options =>
 {

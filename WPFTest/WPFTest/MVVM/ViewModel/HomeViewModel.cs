@@ -102,18 +102,18 @@ namespace WPFTest.MVVM.ViewModel
             };
 
             if (newImageFile.Image != null) 
-                Image = (await _personService.ChangePrivateImage(newImageFile))?.Image;
+                Image = (await _personService.ChangePrivateImageAsync(newImageFile))?.Image;
         }
 
         public async Task DeleteImage()
         {
-            if (await _personService.DeletePrivateImage())
+            if (await _personService.DeletePrivateImageAsync())
                 Image = null;
         }
 
         public async void LoadPerson()
         {
-            var person = await _personService.GetPrivate();
+            var person = await _personService.GetPrivateAsync();
 
             if (person == null)
             {

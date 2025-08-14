@@ -4,6 +4,7 @@
     {
         //Data
         public const int NUMBER_OF_ELEMENTS_PER_PAGE = 20;
+        public const int MAX_REQUEST_SIZE = 1024 * 1024 * 100;
 
         //DataBase
         public const string CONNECTION_STRING = @"Server=(localdb)\MSSQLLocalDB;Database=WPF;Trusted_Connection=True;";

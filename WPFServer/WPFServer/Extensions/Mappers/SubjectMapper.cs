@@ -12,7 +12,7 @@ namespace WPFServer.Extensions.Mappers
                 Name = subjectRequest.Name,
                 Year = subjectRequest.Year,
                 Description = subjectRequest.Description,
-                Exercises = new List<Exercise>()
+                Exercises = []
             };
         }
 

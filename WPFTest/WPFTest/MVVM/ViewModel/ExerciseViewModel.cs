@@ -1,9 +1,9 @@
-﻿
-
+﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
 using WPFTest.FileStreamers;
+using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.ViewModel.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
@@ -25,10 +25,14 @@ namespace WPFTest.MVVM.ViewModel
         private bool _isLoaded = false;
         private bool? _isLiked = false;
         private int? _likesCount = null;
+        private string? _newCommentText = string.Empty;
+        private ObservableCollection<FullComment>? _comments = null;
 
         public ICommand SubjectViewCommand { get; set; }
         public ICommand LoadTasksFileCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
+        public ICommand NewCommentTextCommand {  get; set; }
+        public ICommand CreateCommentCommand { get; set; }
 
         public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, IMainViewModel mainViewModel, Lazy<ISubjectViewModel> subjectViewModel)
         {
@@ -39,12 +43,14 @@ namespace WPFTest.MVVM.ViewModel
             _subjectViewModel = subjectViewModel;
 
             SubjectViewCommand = new RelayCommand(_ => OpenSubjectById(SubjectId));
+            NewCommentTextCommand = new RelayCommand(x => NewCommentText = (string)x);
             LoadTasksFileCommand = new AsyncRelayCommand(async _ => await GetExercisesTasksFileAsync());
             ChangeIsLikedCommand = new AsyncRelayCommand(async x =>
             {
                 await _exerciseService.ChangeIsLikedAsync((int)x);
                 LikesCount = await GetLikesCount();
             });
+            CreateCommentCommand = new AsyncRelayCommand(async _ => await CreateCommentAsync());
         }
 
         public int Id 
@@ -129,6 +135,26 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
+        public string? NewCommentText
+        {
+            get => _newCommentText;
+            set
+            {
+                _newCommentText = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<FullComment>? Comments 
+        {
+            get => _comments;
+            set
+            {
+                _comments = value;
+                OnPropertyChanged();
+            }
+        }
+
         public async void LoadExercise(int id)
         {
             IsLoaded = false;
@@ -146,6 +172,8 @@ namespace WPFTest.MVVM.ViewModel
             IsLoaded = true;
             IsLiked = await _personService.GetIsLickedAsync(Id);
             LikesCount = await GetLikesCount();
+            NewCommentText = string.Empty;
+            Comments = new ObservableCollection<FullComment>(exercise.Comments);
         }
 
         public async Task<int?> GetLikesCount()
@@ -171,6 +199,19 @@ namespace WPFTest.MVVM.ViewModel
             if (files == null) throw new Exception();
 
             ZipFileStreamer.GetFile(files.TasksFile ?? []);
+        }
+
+        public async Task CreateCommentAsync()
+        {
+            var newComment = new NewComment { Text = NewCommentText };
+
+            if (await _exerciseService.AddCommentAsync(Id, newComment)) {
+                NewCommentText = string.Empty;
+
+                var newComments = await _exerciseService.GetCommentsByIdAsync(Id);
+
+                if (newComments != null) Comments = new ObservableCollection<FullComment>(newComments);
+            }
         }
     }
 }

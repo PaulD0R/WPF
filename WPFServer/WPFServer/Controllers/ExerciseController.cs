@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using WPFServer.DTOs.Comment;
 using WPFServer.DTOs.Exercise;
 using WPFServer.Extensions;
 using WPFServer.Extensions.Mappers;
 using WPFServer.Interfaces;
-using WPFServer.Models;
 
 namespace WPFServer.Controllers
 {
@@ -17,11 +17,13 @@ namespace WPFServer.Controllers
     {
         private readonly IExercisesRepository _exercisesRepository;
         private readonly IPersonRepository _personRepository;
+        private readonly ICommentRepository _commentRepository;
 
-        public ExerciseController(IExercisesRepository exercisesRepository, IPersonRepository personRepository)
+        public ExerciseController(IExercisesRepository exercisesRepository, IPersonRepository personRepository, ICommentRepository commentRepository)
         {
             _exercisesRepository = exercisesRepository;
             _personRepository = personRepository;
+            _commentRepository = commentRepository;
         }
 
         [HttpGet]
@@ -118,5 +120,33 @@ namespace WPFServer.Controllers
             return Ok(new { isLiked = isLicked});
         }
 
+        [HttpPost("{id:int}/Comments/Add")]
+        public async Task<IActionResult> AddComment([FromRoute] int id, [FromBody] CommentRequest request)
+        {
+            var exercise = await _exercisesRepository.GetByIdAsync(id);
+            var userName = User.GetUserName();
+
+            if (userName == null) return Unauthorized();
+            if (exercise == null) return NotFound();
+
+            var person = await _personRepository.GetByNameAsync(userName);
+
+            if (person == null) return BadRequest();
+
+            var comment = request.ToComment(person, id);
+
+            await _commentRepository.AddAsync(comment);
+            return Ok();
+        }
+
+        [HttpGet("{id:int}/Comments")]
+        public async Task<IActionResult> GetComments([FromRoute] int id)
+        {
+            var comments = await _commentRepository.GetCommentsByExerciseIdAsync(id);
+
+            if (comments == null) return NotFound();
+
+            return Ok(comments.Select(x => x.ToCommentDto()));
+        }
     }
 }
