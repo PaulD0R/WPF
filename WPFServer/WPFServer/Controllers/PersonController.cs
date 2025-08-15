@@ -27,7 +27,7 @@ namespace WPFServer.Controllers
         {
             var person = await _personRepository.GetByIdAsync(id);
 
-            if (person  == null) return NotFound();
+            if (person  == null) return NotFound("Пользователь не найден");
 
             return Ok(person.ToFullPersonDto());
         }
@@ -38,7 +38,7 @@ namespace WPFServer.Controllers
         {
             var result = await _personRepository.AddRoleByIdAsync(id, role?.Role ?? string.Empty);
 
-            if (!result) return NotFound();
+            if (!result) return NotFound("Пользователь не найден");
 
             return Ok();
         }
@@ -47,19 +47,16 @@ namespace WPFServer.Controllers
         public async Task<ActionResult> GetByName([FromRoute] string name)
         {
             var privatePersonUserName = User.GetUserName();
-
-            if (privatePersonUserName == null) return Unauthorized();
-
-            var privatePerson = await _personRepository.GetByNameAsync(privatePersonUserName);
             var person = await _personRepository.GetByNameAsync(name);
 
-            if (person == null) return NotFound();
+            if (privatePersonUserName == null) return Unauthorized("Не авторизирован");
+            if (person == null) return NotFound("Пользователь не найден");
 
             var personDto = person.ToFullPersonDto();
 
             foreach (var exercise in personDto.Exercises)
             {
-                exercise.IsLiked = await _personRepository.GetIsLikedByIdAsync(privatePerson.Id, exercise.Id);
+                exercise.IsLiked = await _personRepository.GetIsLikedByIdAsync(privatePersonUserName, exercise.Id);
             }
 
             return Ok(personDto);
@@ -78,11 +75,11 @@ namespace WPFServer.Controllers
         {
             var name = User.GetUserName();
 
-            if (name == null) return Unauthorized();
+            if (name == null) return Unauthorized("Не авторизирован");
 
             var person = await _personRepository.GetByNameAsync(name);
 
-            if (person == null) return NotFound();
+            if (person == null) return NotFound("Пользователь не найден");
 
             return Ok(person.ToFullPrivatePersonDto());
         }
@@ -92,11 +89,11 @@ namespace WPFServer.Controllers
         {
             var name = User.GetUserName();
 
-            if (name == null) return Unauthorized();
+            if (name == null) return Unauthorized("Не авторизирован");
 
             var isLiked = await _personRepository.GetIsLikedByIdAsync(name, exerciseId);
 
-            if (isLiked == null) return NotFound();
+            if (isLiked == null) return NotFound("Пользователь не найден");
 
             return Ok(new { IsLiked = isLiked });
         }
@@ -106,12 +103,12 @@ namespace WPFServer.Controllers
         {
             var name = User.GetUserName();
 
-            if (name == null) return Unauthorized();
+            if (name == null) return Unauthorized("Не авторизирован");
 
             var person = await _personRepository.GetByNameAsync(name);
 
-            if (person == null) return NotFound();
-            if (newImage.Image == null) return BadRequest();
+            if (person == null) return NotFound("Пользователь не найден");
+            if (newImage.Image == null) return BadRequest("Некорректное изображение");
 
             await _personsFilesRepository.ChangeImageAsync(person.Id, newImage.Image);
 
@@ -123,15 +120,15 @@ namespace WPFServer.Controllers
         {
             var name = User.GetUserName();
 
-            if (name == null) return Unauthorized();
+            if (name == null) return Unauthorized("Не авторизирован");
 
             var person = await _personRepository.GetByNameAsync(name);
 
-            if (person == null) return NotFound();
+            if (person == null) return NotFound("Пользователь не найден");
 
             await _personsFilesRepository.DeleteImageAsync(person.Id);
 
-            return Ok();
+            return NoContent();
         }
 
         [HttpGet("Me/Comments")]
@@ -139,7 +136,7 @@ namespace WPFServer.Controllers
         {
             var userName = User.GetUserName();
 
-            if (userName == null) return Unauthorized();
+            if (userName == null) return Unauthorized("Не авторизирован");
 
             var comments = await _personRepository.GetCommentsByNameAsync(userName);
             return Ok(comments?.Select(x => x.ToCommentDto()));
@@ -150,11 +147,10 @@ namespace WPFServer.Controllers
         {
             var userName = User.GetUserName();
 
-            if (userName == null) return Unauthorized();
-            if (!await _personRepository.DeleteCommentByIdAsync(userName, commentId)) return BadRequest();
+            if (userName == null) return Unauthorized("Не авторизирован");
+            if (!await _personRepository.DeleteCommentByIdAsync(userName, commentId)) return BadRequest("Ошибка");
 
             return NoContent();
-
         }
     }
 }

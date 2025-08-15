@@ -1,25 +1,27 @@
 ﻿<UserControl x:Class="WPFTest.MVVM.View.NewExercisesView"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WPFTest.MVVM.View"
-             xmlns:behavior="clr-namespace:WPFTest.Behaviors"
              xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="900">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanTiVisibbilityConverter"/>
+    </UserControl.Resources>
     <Grid Height="450"
           MinWidth="795">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
@@ -97,9 +99,6 @@
                  HorizontalAlignment="Left"
                  VerticalAlignment="Center"
                  BorderThickness="0">
-            <i:Interaction.Behaviors>
-                <behavior:ValueChangedBehavior Command="{Binding NumberCommand}"/>
-            </i:Interaction.Behaviors>
         </toolkit:IntegerUpDown>
 
         <TextBox Background="#333540"
@@ -115,9 +114,6 @@
                  AcceptsReturn="True"
                  VerticalScrollBarVisibility="Hidden"
                  BorderThickness="0">
-            <i:Interaction.Behaviors>
-                <behavior:TextChangedBehavior Command="{Binding TaskCommand}"/>
-            </i:Interaction.Behaviors>
         </TextBox>
 
         <Grid Grid.Column="1"
@@ -149,5 +145,11 @@
                 Foreground="White"
                 Command="{Binding SaveCommand}"/>
         </Grid>
+
+        <ContentControl Grid.Row="4"
+                        Grid.ColumnSpan="2"
+                        Content="{Binding ErrorText}"
+                        ContentTemplate="{StaticResource ErrorTextBlock}"
+                        Visibility="{Binding IsError, Converter={StaticResource BooleanTiVisibbilityConverter}}"/>
     </Grid>
 </UserControl>

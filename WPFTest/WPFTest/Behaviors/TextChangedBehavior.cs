@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace WPFTest.Behaviors
 {
-    class TextChangedBehavior : Behavior<TextBox>
+    public class TextChangedBehavior : Behavior<TextBox>
     {
         public static readonly DependencyProperty CommandProperty =
         DependencyProperty.Register(

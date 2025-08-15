@@ -1,7 +1,9 @@
-﻿using System.Windows.Input;
+﻿using System.Security;
+using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
 using WPFTest.Data;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.Services.Interfaces;
@@ -11,10 +13,13 @@ namespace WPFTest.MVVM.ViewModel
     public class SigninViewModel : ObserverItem, ISigninViewModel
     {
         private readonly ApiAuthenticationService _personService;
+
         private readonly INavigationService _navigationService;
 
-        private string? _name = "string";
-        private string? _password = "stringsT8.";
+        private string? _name = string.Empty;
+        private string? _password = string.Empty;
+        private bool? _isError = false;
+        private string? _errorText = string.Empty;
 
         public ICommand NameCommand { get; set; }
         public ICommand PasswordCommand { get; set; }
@@ -23,10 +28,8 @@ namespace WPFTest.MVVM.ViewModel
         public SigninViewModel(ApiAuthenticationService personService, INavigationService navigationService)
         {
             _personService = personService;
-            _navigationService = navigationService;
 
-            //Name = string.Empty;
-            //Password = string.Empty;
+            _navigationService = navigationService;
 
             NameCommand = new RelayCommand(x => Name = (string)x);
             PasswordCommand = new RelayCommand(x => Password = (string)x);
@@ -49,23 +52,66 @@ namespace WPFTest.MVVM.ViewModel
             set
             {
                 _password = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? IsError
+        {
+            get => _isError;
+            set
+            {
+                _isError = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string? ErrorText 
+        {
+            get => _errorText;
+            set
+            {
+                _errorText = value;
+                OnPropertyChanged();
             }
         }
 
         public async Task Signin()
         {
-            var signinPerson = new SigninPerson
+            try
             {
-                Name = Name,
-                Password = Password
-            };
+                if (Name != string.Empty && Password != string.Empty)
+                {
+                    var signinPerson = new SigninPerson
+                    {
+                        Name = Name,
+                        Password = Password
+                    };
 
-            var person = await _personService.Signin(signinPerson);
+                    var person = await _personService.Signin(signinPerson);
 
-            if (person != null)
+                    if (person != null)
+                    {
+                        StaticData.TOKEN = person.Token ?? string.Empty;
+                        _navigationService.ShowWindow<MainWindow>();
+                    }
+                }
+                else
+                {
+                    ErrorText = "Заполните все поля";
+                    IsError = true;
+                    return;
+                }
+            }
+            catch (ApiExeption ex)
             {
-                StaticData.TOKEN = person.Token ?? string.Empty;
-                _navigationService.ShowWindow<MainWindow>();
+                ErrorText = ex.Message;
+                IsError = true;
+            }
+            catch
+            {
+                ErrorText = "Ошибка";
+                IsError = true;
             }
         }
     }

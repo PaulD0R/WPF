@@ -47,9 +47,16 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                             
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="20, 0, 0, 0">
-                                <StackPanel Orientation="Vertical">
+                            <Grid Margin="20, 0, 0, 0"
+                                  HorizontalAlignment="Stretch"
+                                  Width="Auto">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Orientation="Vertical"
+                                            Grid.Column="0">
                                     <TextBlock Text="Предмет"
                                                FontSize="10"
                                                Foreground="White"
@@ -58,11 +65,13 @@
                                     <TextBlock Text="{Binding Subject}"
                                                FontSize="25"
                                                Foreground="White"
-                                               TextWrapping="Wrap"/>
+                                               TextWrapping="Wrap"
+                                               Margin="0, 0, 0, 5"/>
                                 </StackPanel>
 
                                 <StackPanel Orientation="Vertical"
-                                            Margin="40, 0, 0, 0">
+                                            Margin="40, 0, 0, 0"
+                                            Grid.Column="1">
                                     <TextBlock Text="Курс"
                                                FontSize="10"
                                                Foreground="White"
@@ -71,9 +80,10 @@
                                     <TextBlock Text="{Binding Year}"
                                                FontSize="25"
                                                Foreground="White"
-                                               TextWrapping="Wrap"/>
+                                               TextWrapping="Wrap"
+                                               Margin="10, 0, 0, 0"/>
                                 </StackPanel>
-                            </StackPanel>
+                            </Grid>
                         </Border>
 
                         <TextBlock Text="Номер"
@@ -133,8 +143,15 @@
                                Foreground="White"
                                FontSize="35"
                                HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
+                               VerticalAlignment="Center"
+                               Margin="5"/>
                 </Border>
+
+                <ContentControl Content="{Binding ErrorText}"
+                                Visibility="{Binding IsError, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                ContentTemplate="{StaticResource ErrorTextBlock}"
+                                Margin="5, 0, 5, 0"/>
+
 
                 <Border CornerRadius="15"
                         Background="#333540"
@@ -201,7 +218,8 @@
                                     <TextBlock Text="{Binding Text}"
                                                FontSize="15"
                                                Foreground="White"
-                                               Margin="15, 0, 15, 5"/>
+                                               Margin="15, 0, 15, 5"
+                                               TextWrapping="Wrap"/>
 
                                     <TextBlock Text="{Binding Date}"
                                                FontSize="10"

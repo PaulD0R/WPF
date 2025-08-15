@@ -1,7 +1,6 @@
-﻿using Azure;
-using System.Net.Http;
+﻿using System.Net.Http;
 using WPFTest.Data;
-using WPFTest.MVVM.Model.Comments;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Data;
 using WPFTest.MVVM.Model.Files;
 using WPFTest.MVVM.Model.Person;
@@ -23,67 +22,67 @@ namespace WPFTest.ApiServices
 
         public async Task<PrivatePerson?> GetPrivateAsync()
         {
-            PrivatePerson? person = null;
             var response = await _httpClient.GetAsync("Me");
 
             if (response.IsSuccessStatusCode)
-            {
-                person = await response.Content.ReadAsAsync<PrivatePerson>();
-            }
+                return await response.Content.ReadAsAsync<PrivatePerson>();
 
-            return person;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<FullPerson?> GetPersonByIdAsync(string id)
         {
-            FullPerson? person = null;
             var response = await _httpClient.GetAsync($"Id/{id}");
 
             if (response.IsSuccessStatusCode)
-            {
-                person = await response.Content.ReadAsAsync<FullPerson>();
-            }
+                return await response.Content.ReadAsAsync<FullPerson>();
 
-            return person;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<FullPerson?> GetPersonByNameAsync(string name)
         {
-            FullPerson? person = null;
             var response = await _httpClient.GetAsync($"Name/{name}");
 
             if (response.IsSuccessStatusCode)
-            {
-                person = await response.Content.ReadAsAsync<FullPerson>();
-            }
+                return await response.Content.ReadAsAsync<FullPerson>();
 
-            return person;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<bool?> GetIsLickedAsync(int exerciseId)
         {
             var response = await _httpClient.GetAsync($"Me/IsLicked/{exerciseId}");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
+            if (response.IsSuccessStatusCode)
+                return (await response.Content.ReadAsAsync<PersonData>()).IsLiked;
 
-            var personData = await response.Content.ReadAsAsync<PersonData>();
-            return personData.IsLiked;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<ImageNewFile?> ChangePrivateImageAsync(ImageNewFile newImage)
         {
-            ImageNewFile? image = null;
             var response = await _httpClient.PutAsJsonAsync("Me/Image/Change", newImage);
 
             if (response.IsSuccessStatusCode)
-            {
-                image = await response.Content.ReadAsAsync<ImageNewFile>();
-            }
+                return await response.Content.ReadAsAsync<ImageNewFile>();
 
-            return image;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<bool> DeletePrivateImageAsync()
@@ -91,11 +90,12 @@ namespace WPFTest.ApiServices
             var response = await _httpClient.DeleteAsync("Me/Image/Delete");
 
             if (response.IsSuccessStatusCode)
-            {
                 return true;
-            }
 
-            return false;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<bool> DeleteCommentAsync(int id)
@@ -103,11 +103,12 @@ namespace WPFTest.ApiServices
             var response = await _httpClient.DeleteAsync($"Me/Comments/Delete/{id}");
 
             if (response.IsSuccessStatusCode)
-            {
                 return true;
-            }
 
-            return false;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
     }
 }

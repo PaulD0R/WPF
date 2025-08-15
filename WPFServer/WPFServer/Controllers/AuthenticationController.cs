@@ -31,10 +31,10 @@ namespace WPFServer.Controllers
             if (!ModelState.IsValid) return BadRequest();
 
             var person = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == signinRequest.Name);
-            if (person == null) return Unauthorized("Invalid UserName");
+            if (person == null) return Unauthorized("Пользователь не существует");
 
             var result = await _signInManager.CheckPasswordSignInAsync(person, signinRequest.Password, false);
-            if (!result.Succeeded) return Unauthorized("Invalid Password");
+            if (!result.Succeeded) return Unauthorized("Неверный пароль");
 
             var token = await _authenticationRepository.CreateJwtAsync(person);
 
@@ -44,6 +44,8 @@ namespace WPFServer.Controllers
         [HttpPost("Signup")]
         public async Task<IActionResult> Signup([FromBody] NewPersonRequest newPersonRequest)
         {
+            if (!ModelState.IsValid) return BadRequest("Некорректный запрос");
+
             var person = newPersonRequest.ToPerson();
             var createPerson = await _userManager.CreateAsync(person, newPersonRequest.Password);
 
@@ -61,7 +63,10 @@ namespace WPFServer.Controllers
                 }
             }
 
-            return StatusCode(500, createPerson.Errors);
+            if (createPerson.Errors.Any(e => e.Code == "DuplicateUserName"))
+                return Conflict("Пользователь с таким именем уже существует");
+
+            return StatusCode(500);
         }
     }
 }

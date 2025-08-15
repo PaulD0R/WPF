@@ -5,7 +5,7 @@ using Xceed.Wpf.Toolkit;
 
 namespace WPFTest.Behaviors
 {
-    class ValueChangedBehavior : Behavior<IntegerUpDown>
+    public class ValueChangedBehavior : Behavior<IntegerUpDown>
     {
         public static readonly DependencyProperty CommandProperty =
             DependencyProperty.Register(

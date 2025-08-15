@@ -101,7 +101,7 @@ namespace WPFTest.MVVM.ViewModel
 
         public void OpenExerciseById(int id)
         {
-            (_exerciseViewModel.Value).LoadExercise(id);
+            _exerciseViewModel.Value.LoadExercise(id);
             _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.ViewModel.Interfaces;
 
@@ -9,10 +10,12 @@ namespace WPFTest.MVVM.ViewModel
     public class SubjectViewModel : ObserverItem, ISubjectViewModel
     {
         private readonly ApiExerciseService _exerciseService;
+        private readonly ApiSubjectService _subjectService;
 
         private readonly IMainViewModel _mainViewModel;
         private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
-        private readonly ApiSubjectService _subjectService;
+        private readonly Lazy<IErrorViewModel> _errorViewModel;
+
 
         private string? _name;
         private int? _year;
@@ -22,11 +25,13 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ExerciseViewCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
 
-        public SubjectViewModel(ApiSubjectService subjectService, IMainViewModel mainViewModel, Lazy<IExerciseViewModel> exerciseViewModel, ApiExerciseService exerciseService)
+        public SubjectViewModel(ApiSubjectService subjectService, IMainViewModel mainViewModel, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel, ApiExerciseService exerciseService)
         {
             _mainViewModel = mainViewModel;
-            _subjectService = subjectService;
             _exerciseViewModel = exerciseViewModel;
+            _errorViewModel = errorViewModel;
+
+            _subjectService = subjectService;
             _exerciseService = exerciseService;
 
             ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int)x));
@@ -75,17 +80,25 @@ namespace WPFTest.MVVM.ViewModel
 
         public async void LoadSubject(int id)
         {
-            var subject = await _subjectService.GetByIdAsync(id);
+            try
+            {
+                var subject = await _subjectService.GetByIdAsync(id);
 
-            Name = subject?.Name ?? string.Empty;
-            Year = subject?.Year ?? 0;
-            Description = subject?.Description ?? string.Empty;
-            Exercises = subject?.Exercises ?? null;
+                Name = subject?.Name ?? string.Empty;
+                Year = subject?.Year ?? 0;
+                Description = subject?.Description ?? string.Empty;
+                Exercises = subject?.Exercises ?? null;
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public void OpenExerciseById(int id)
         {
-            (_exerciseViewModel.Value).LoadExercise(id);
+            _exerciseViewModel.Value.LoadExercise(id);
             _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
         }
     }

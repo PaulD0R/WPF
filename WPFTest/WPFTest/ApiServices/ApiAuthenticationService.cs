@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 
 namespace WPFTest.ApiServices
@@ -15,28 +16,29 @@ namespace WPFTest.ApiServices
 
         public async Task<Person?> Signup(SignupPerson signupPerson)
         {
-            Person? person = null;
             var response = await _httpClient.PostAsJsonAsync("Signup", signupPerson);
 
             if (response.IsSuccessStatusCode)
-            {
-                person = await response.Content.ReadAsAsync<Person>();
-            }
+                return await response.Content.ReadAsAsync<Person>();
 
-            return person;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
+            
         }
 
         public async Task<Person?> Signin(SigninPerson signinPerson)
         {
-            Person? person = null;
             var response = await _httpClient.PostAsJsonAsync("Signin", signinPerson);
 
             if (response.IsSuccessStatusCode)
-            {
-                person = await response.Content.ReadAsAsync<Person>();
-            }
+                return await response.Content.ReadAsAsync<Person>();
 
-            return person;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
     }
 }

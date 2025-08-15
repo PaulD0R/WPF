@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using WPFTest.Data;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Subject;
 
 namespace WPFTest.ApiServices
@@ -19,45 +20,41 @@ namespace WPFTest.ApiServices
 
         public async Task<ICollection<LightSubject>> GetAllAsync()
         {
-            var subjects = new List<LightSubject>();    
             var response = await _httpClient.GetAsync("");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return subjects;
-            }
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<List<LightSubject>>();
 
-            subjects = await response.Content.ReadAsAsync<List<LightSubject>>();
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
 
-            return subjects;
+            throw new ApiExeption(error);
         }
 
         public async Task<FullSubject?> GetByIdAsync(int id)
         {
-            FullSubject? subject = null;
             var response = await _httpClient.GetAsync($"{id}");
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return subject;
-            }
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<FullSubject>();
 
-            subject = await response.Content.ReadAsAsync<FullSubject>();
-            
-            return subject;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
-        public async Task<string> AddSubjectAsync(NewSubject subject)
+        public async Task<bool> AddSubjectAsync(NewSubject subject)
         {
-            var error = string.Empty;
             var response = await _httpClient.PostAsJsonAsync("Add", subject);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                error = response.StatusCode.ToString();
-            }
+            if (response.IsSuccessStatusCode)
+                return true;
 
-            return error;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
     }
 }

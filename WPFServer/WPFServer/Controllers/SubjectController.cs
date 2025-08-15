@@ -35,8 +35,8 @@ namespace WPFServer.Controllers
             var subject = await _subjectRepository.GetByIdAsync(id);
             var personName = User.GetUserName();
 
-            if (subject == null) return NotFound();
-            if (personName == null) return Unauthorized();
+            if (subject == null) return NotFound("Предмет не найден");
+            if (personName == null) return Unauthorized("Не авторизирован");
 
             return Ok(subject.ToSubjectDto(personName));
         }
@@ -47,7 +47,7 @@ namespace WPFServer.Controllers
         {
             var subject = subjectRequest.ToSubject();
 
-            if (!await _subjectRepository.AddAsync(subject)) return BadRequest();
+            if (!await _subjectRepository.AddAsync(subject)) return BadRequest("Некорректный запрос");
 
             return Ok(subject);
         }

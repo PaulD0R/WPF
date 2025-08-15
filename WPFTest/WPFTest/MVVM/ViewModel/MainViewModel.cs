@@ -13,7 +13,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly IJwtService _jwtService;
 
         private ICollection<string>? _roles;
-
         private object _currentView;
         private bool _isMenuVisible;
         private bool? _isDiscover;
@@ -77,8 +76,7 @@ namespace WPFTest.MVVM.ViewModel
             });
             ChangeMenuCommand = new RelayCommand(_ => IsMenuVisible = !IsMenuVisible);
             ChangeWindowSizeCommand = new RelayCommand(_ => Radius = StaticData.MAIN_WINDOW_RADIUS - Radius);
-            FindNameCommand = new RelayCommand(
-                x => FindName = (string)x);
+            FindNameCommand = new RelayCommand(x => FindName = (string)x);
 
             _navigationService.CloseAnotherWindow<MainWindow>();
 

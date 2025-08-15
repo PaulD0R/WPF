@@ -32,7 +32,7 @@ namespace WPFServer.Controllers
             var personName = User.GetUserName();
             var exercises = await _exercisesRepository.GetAllAsync();
 
-            if (personName == null) return Unauthorized();
+            if (personName == null) return Unauthorized("Не авторизирован");
 
             var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personName)).ToList();
 
@@ -52,8 +52,8 @@ namespace WPFServer.Controllers
             var exercises = await _exercisesRepository.GetByPageAsync(page);
             var personName = User.GetUserName();
 
-            if (personName == null) return Unauthorized();
-            if (exercises == null) return NotFound();
+            if (personName == null) return Unauthorized("Не авторизирован");
+            if (exercises == null) return NotFound("Упражнение не найдено");
 
             var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personName)).ToList();
 
@@ -65,7 +65,7 @@ namespace WPFServer.Controllers
         {
             var file = await _exercisesRepository.GetTasksFileByIdAsync(id);
 
-            if (file == null) return NotFound();
+            if (file == null) return NotFound("Некорректный запрос");
 
             return Ok(file);
         }
@@ -76,8 +76,8 @@ namespace WPFServer.Controllers
             var exercise = await _exercisesRepository.GetByIdAsync(id);
             var personName = User.GetUserName();
 
-            if (personName == null) return Unauthorized();
-            if (exercise == null) return NotFound();
+            if (personName == null) return Unauthorized("Не авторизирован");
+            if (exercise == null) return NotFound("Упражнение не найдено");
 
             return Ok(exercise.ToFullExerciseDto(personName));
         }
@@ -88,7 +88,7 @@ namespace WPFServer.Controllers
         {
             var exercise = request.ToExercise();
 
-            if (exercise == null) return BadRequest();
+            if (exercise == null) return BadRequest("Некорректный запрос");
 
             await _exercisesRepository.AddAsync(exercise);
 
@@ -100,7 +100,7 @@ namespace WPFServer.Controllers
         {
             var likesCount = await _exercisesRepository.GetLikesCountByIdAsync(id);
 
-            if (likesCount == null) return NotFound();
+            if (likesCount == null) return NotFound("Упражнение не найдено");
 
             return Ok(new { LikesCount = likesCount });
         }
@@ -110,11 +110,11 @@ namespace WPFServer.Controllers
         {
             var personName = User.GetUserName();
 
-            if (personName == null) return NotFound();
+            if (personName == null) return NotFound("Упражнение не найдено");
 
             var person = await _personRepository.GetByNameAsync(personName);
             
-            if (person == null) return Unauthorized();
+            if (person == null) return Unauthorized("Не авторизирован");
 
             var isLicked = await _exercisesRepository.ChangeIsLikedAsync(person, id);
             return Ok(new { isLiked = isLicked});
@@ -126,12 +126,12 @@ namespace WPFServer.Controllers
             var exercise = await _exercisesRepository.GetByIdAsync(id);
             var userName = User.GetUserName();
 
-            if (userName == null) return Unauthorized();
-            if (exercise == null) return NotFound();
+            if (userName == null) return Unauthorized("Не авторизирован");
+            if (exercise == null) return NotFound("Упражнение не найдено");
 
             var person = await _personRepository.GetByNameAsync(userName);
 
-            if (person == null) return BadRequest();
+            if (person == null) return NotFound("Пользователь не найден");
 
             var comment = request.ToComment(person, id);
 
@@ -144,7 +144,7 @@ namespace WPFServer.Controllers
         {
             var comments = await _commentRepository.GetCommentsByExerciseIdAsync(id);
 
-            if (comments == null) return NotFound();
+            if (comments == null) return NotFound("Комментарий не найден");
 
             return Ok(comments.Select(x => x.ToCommentDto()));
         }

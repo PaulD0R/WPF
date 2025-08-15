@@ -1,5 +1,6 @@
 ﻿using System.Net.Http;
 using WPFTest.Data;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.Model.Data;
 using WPFTest.MVVM.Model.Exercise;
@@ -22,112 +23,116 @@ namespace WPFTest.ApiServices
 
         public async Task<int> GetCountAsync()
         {
-            int count = 0;
             var response = await _httpClient.GetAsync("Count");
 
             if (response.IsSuccessStatusCode)
-            {
-                count = await response.Content.ReadAsAsync<int>();
-            }
+                return await response.Content.ReadAsAsync<int>();
 
-            return count;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<List<LightExercise>> GetByPageAsync(int page)
         {
-            var exercises = new List<LightExercise>();
             var response = await _httpClient.GetAsync($"Page{page}");
 
             if (response.IsSuccessStatusCode)
-            {
-                exercises = await response.Content.ReadAsAsync<List<LightExercise>>();
-            }
+                return await response.Content.ReadAsAsync<List<LightExercise>>();
 
-            return exercises;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<ExercisesTasksFile?> GetFileByIdAsync(int id)
         {
-            ExercisesTasksFile? file = null;
             var response = await _httpClient.GetAsync($"{id}/File/Task");
 
             if (response.IsSuccessStatusCode)
-            {
-                file = await response.Content.ReadAsAsync<ExercisesTasksFile>();
-            }
-
-            return file;
+                return await response.Content.ReadAsAsync<ExercisesTasksFile>();
+            
+            throw new ApiExeption(response.StatusCode);
         }
 
         public async Task<FullExercise?> GetByIdAsync(int id)
         {
-            FullExercise? exercise = null;
             var response = await _httpClient.GetAsync($"{id}");
 
             if (response.IsSuccessStatusCode)
-            {
-                exercise = await response.Content.ReadAsAsync<FullExercise>();
-            }
+                return await response.Content.ReadAsAsync<FullExercise>();
 
-            return exercise;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
-        public async Task<string> AddExerciseAsync(NewExercise exercise)
+        public async Task<bool> AddExerciseAsync(NewExercise exercise)
         {
-            var error = string.Empty;
             var response = await _httpClient.PostAsJsonAsync("Add", exercise);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                error = response.StatusCode.ToString();
-            }
+            if (response.IsSuccessStatusCode)
+                return true;
 
-            return error;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<ExerciseState?> ChangeIsLikedAsync(int id)
         {
             var response = await _httpClient.PutAsync($"{id}/IsLiked", null);
 
-            if (!response.IsSuccessStatusCode) return null;
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<ExerciseState>();
 
-            var isLicked = await response.Content.ReadAsAsync<ExerciseState>();
-            return isLicked;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<ExerciseState?> GetLikesCountByIdAsync(int id)
         {
             var response = await _httpClient.GetAsync($"{id}/LikesCount");
 
-            if (!response.IsSuccessStatusCode) return null;
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsAsync<ExerciseState>();
 
-            var likesCount = await response.Content.ReadAsAsync<ExerciseState>();
-            return likesCount;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<bool> AddCommentAsync(int id, NewComment comment) 
         {
             var response = await _httpClient.PostAsJsonAsync($"{id}/Comments/Add", comment);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                return false;
-            }
+            if (response.IsSuccessStatusCode)
+                return true;
 
-            return true;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public async Task<ICollection<FullComment>?> GetCommentsByIdAsync(int id)
         {
-            List<FullComment>? comments = null;
             var response = await _httpClient.GetAsync($"{id}/Comments");
 
             if (response.IsSuccessStatusCode)
-            {
-                comments = await response.Content.ReadAsAsync<List<FullComment>>();
-            }
+                return await response.Content.ReadAsAsync<List<FullComment>>();
 
-            return comments;
+            var error = await response.Content.ReadAsStringAsync();
+            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+
+            throw new ApiExeption(error);
         }
 
         public void Dispose()

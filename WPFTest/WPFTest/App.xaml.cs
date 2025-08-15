@@ -51,6 +51,7 @@ namespace WPFTest
             //Services
             services.AddTransient<INavigationService, NavigationService>();
             services.AddTransient<IJwtService, JwtService>();
+            services.AddTransient<ICheckCorrectServise, CheckCorrectService>();
 
             //ViewModels
             services.AddSingleton<IHomeViewModel, HomeViewModel>();
@@ -64,6 +65,7 @@ namespace WPFTest
             services.AddScoped<IExerciseViewModel, ExerciseViewModel>();
             services.AddSingleton<ISubjectViewModel, SubjectViewModel>();
             services.AddSingleton<IPersonViewModel, PersonViewModel>();
+            services.AddSingleton<IErrorViewModel, ErrorViewModel>();
 
             //Lazy ViewModels
             services.AddSingleton(provider =>
@@ -90,6 +92,8 @@ namespace WPFTest
             services.AddSingleton(provider =>
                 new Lazy<IPersonViewModel>(() => provider.GetRequiredService<IPersonViewModel>())
             );
+            services.AddSingleton(provider =>
+                new Lazy<IErrorViewModel>(() => provider.GetRequiredService<IErrorViewModel>()));
 
             //View
             services.AddTransient<HomeView>();
@@ -103,6 +107,7 @@ namespace WPFTest
             services.AddTransient<ExerciseView>();
             services.AddTransient<SubjectView>();
             services.AddTransient<PersonView>();
+            services.AddTransient<ErrorViewModel>();
         }
     }
 }

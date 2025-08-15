@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DataTemplate x:Key="ErrorTextBlock">
+        <Border CornerRadius="15"
+                Background="Red"
+                BorderThickness="0"
+                Margin="10"
+                HorizontalAlignment="Stretch"
+                Height="Auto">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <Image VerticalAlignment="Center"
+                       Margin="5"
+                       Source="/Images/Failed.png"
+                       MaxHeight="50"
+                       MaxWidth="50"
+                       Grid.Column="0"/>
+
+                <TextBlock Foreground="Black"
+                           FontSize="15"
+                           TextWrapping="Wrap"
+                           Margin="5"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Stretch"
+                           Width="Auto"
+                           Text="{Binding}"
+                           Grid.Column="1"/>
+            </Grid>
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

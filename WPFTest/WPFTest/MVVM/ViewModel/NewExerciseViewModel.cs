@@ -13,6 +13,7 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiExerciseService _exerciseService;
         private readonly ApiSubjectService _subjectService;
+
         private readonly IMainViewModel _mainViewModel;
         private readonly Lazy<INewSubjectViewModel> _newSubjectViewModel;
 
@@ -21,10 +22,9 @@ namespace WPFTest.MVVM.ViewModel
         private string? _task;
         private byte[]? _file;
         private ICollection<LightSubject>? _subjects;
+        private bool? _isError;
+        private string? _errorText;
 
-        public ICommand SubjectCommand { get; set; }
-        public ICommand NumberCommand { get; set; }
-        public ICommand TaskCommand { get; set; }
         public ICommand FileCommand { get; set; }
         public ICommand SaveCommand { get; set; }
         public ICommand NewSubjectViewCommand { get; set; }
@@ -41,10 +41,9 @@ namespace WPFTest.MVVM.ViewModel
             _number = 1;
             _task = string.Empty;
             _file = null;
+            _isError = false;
+            _errorText = string.Empty;
 
-            SubjectCommand = new RelayCommand(x => SubjectId = (int?)x);
-            NumberCommand = new RelayCommand(x => Number = (int?)x);
-            TaskCommand = new RelayCommand(x => Task = (string)x);
             FileCommand = new RelayCommand(_ => File = ZipFileStreamer.SetFile());
             NewSubjectViewCommand = new RelayCommand(_ => OpenNewSubject());
             SaveCommand = new AsyncRelayCommand(async _ => await CreateNewExerciseAsync());
@@ -101,6 +100,26 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
+        public bool? IsError 
+        {
+            get => _isError;
+            set
+            {
+                _isError = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string? ErrorText
+        {
+            get => _errorText;
+            set
+            {
+                _errorText = value;
+                OnPropertyChanged();
+            }
+        }
+
         public async void LoadSubjects()
         {
             Subjects = await _subjectService.GetAllAsync();
@@ -112,7 +131,7 @@ namespace WPFTest.MVVM.ViewModel
             {
                 var exercise = new NewExercise
                 {
-                    SubjectId = 1,
+                    SubjectId = SubjectId,
                     Number = Number,
                     Task = Task,
                     Files = new ExercisesTasksFile()
@@ -121,12 +140,23 @@ namespace WPFTest.MVVM.ViewModel
                     }
                 };
 
-                var error = await _exerciseService.AddExerciseAsync(exercise);
+                if(!await _exerciseService.AddExerciseAsync(exercise))
+                {
+                    ErrorText = "Неудалось создать упражнение";
+                    IsError = true;
+                    return;
+                }
 
                 SubjectId = 1;
                 Number = 1;
                 Task = string.Empty;
                 File = null;
+                IsError = false;
+            }
+            else
+            {
+                ErrorText = "Заполните все поля";
+                IsError = true;
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Exeptions;
 using WPFTest.FileStreamers;
 using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.ViewModel.Interfaces;
@@ -15,6 +16,7 @@ namespace WPFTest.MVVM.ViewModel
 
         private readonly IMainViewModel _mainViewModel;
         private readonly Lazy<ISubjectViewModel> _subjectViewModel;
+        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
         private int _id = 0;
         private int _subjectId = 0;
@@ -27,23 +29,24 @@ namespace WPFTest.MVVM.ViewModel
         private int? _likesCount = null;
         private string? _newCommentText = string.Empty;
         private ObservableCollection<FullComment>? _comments = null;
+        private bool? _isError = false;
+        private string? _errorText = string.Empty;
 
         public ICommand SubjectViewCommand { get; set; }
         public ICommand LoadTasksFileCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
-        public ICommand NewCommentTextCommand {  get; set; }
         public ICommand CreateCommentCommand { get; set; }
 
-        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, IMainViewModel mainViewModel, Lazy<ISubjectViewModel> subjectViewModel)
+        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, IMainViewModel mainViewModel, Lazy<ISubjectViewModel> subjectViewModel, Lazy<IErrorViewModel> errorViewModel)
         {
             _exerciseService = apiExerciseService;
             _personService = personService;
 
             _mainViewModel = mainViewModel;
             _subjectViewModel = subjectViewModel;
+            _errorViewModel = errorViewModel;
 
             SubjectViewCommand = new RelayCommand(_ => OpenSubjectById(SubjectId));
-            NewCommentTextCommand = new RelayCommand(x => NewCommentText = (string)x);
             LoadTasksFileCommand = new AsyncRelayCommand(async _ => await GetExercisesTasksFileAsync());
             ChangeIsLikedCommand = new AsyncRelayCommand(async x =>
             {
@@ -145,6 +148,26 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
+        public bool? IsError 
+        {
+            get => _isError;
+            set
+            {
+                _isError = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string? ErrorText
+        {
+            get => _errorText;
+            set
+            {
+                _errorText = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ObservableCollection<FullComment>? Comments 
         {
             get => _comments;
@@ -157,23 +180,33 @@ namespace WPFTest.MVVM.ViewModel
 
         public async void LoadExercise(int id)
         {
-            IsLoaded = false;
-            Id = id;
-            var exercise = await _exerciseService.GetByIdAsync(Id);
+            try
+            {
+                IsLoaded = false;
+                Id = id;
+                var exercise = await _exerciseService.GetByIdAsync(Id);
 
-            if (exercise == null) throw new Exception();
+                if (exercise == null) throw new Exception();
 
-            Id = exercise.Id;
-            SubjectId = exercise.SubjectId;
-            Subject = exercise.Subject?.Name;
-            Year = exercise.Subject?.Year;
-            Number = exercise.Number;
-            Task = exercise.Task;
-            IsLoaded = true;
-            IsLiked = await _personService.GetIsLickedAsync(Id);
-            LikesCount = await GetLikesCount();
-            NewCommentText = string.Empty;
-            Comments = new ObservableCollection<FullComment>(exercise.Comments);
+                Id = exercise.Id;
+                SubjectId = exercise.SubjectId;
+                Subject = exercise.Subject?.Name;
+                Year = exercise.Subject?.Year;
+                Number = exercise.Number;
+                Task = exercise.Task;
+                IsLoaded = true;
+                IsLiked = await _personService.GetIsLickedAsync(Id);
+                LikesCount = await GetLikesCount();
+                NewCommentText = string.Empty;
+                Comments = new ObservableCollection<FullComment>(exercise.Comments);
+                IsError = false;
+                ErrorText = string.Empty;
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public async Task<int?> GetLikesCount()
@@ -189,7 +222,7 @@ namespace WPFTest.MVVM.ViewModel
         {
             if (id <= 0) return;
 
-            (_subjectViewModel.Value).LoadSubject(id);
+            _subjectViewModel.Value.LoadSubject(id);
             _mainViewModel.ChangeCurrentView(_subjectViewModel.Value);
         }
 
@@ -203,14 +236,30 @@ namespace WPFTest.MVVM.ViewModel
 
         public async Task CreateCommentAsync()
         {
-            var newComment = new NewComment { Text = NewCommentText };
+            if (NewCommentText != string.Empty && NewCommentText != null)
+            {
+                var newComment = new NewComment { Text = NewCommentText };
 
-            if (await _exerciseService.AddCommentAsync(Id, newComment)) {
-                NewCommentText = string.Empty;
+                if (await _exerciseService.AddCommentAsync(Id, newComment))
+                {
+                    NewCommentText = string.Empty;
 
-                var newComments = await _exerciseService.GetCommentsByIdAsync(Id);
+                    var newComments = await _exerciseService.GetCommentsByIdAsync(Id);
 
-                if (newComments != null) Comments = new ObservableCollection<FullComment>(newComments);
+                    if (newComments != null) Comments = new ObservableCollection<FullComment>(newComments);
+                }
+                else
+                {
+                    ErrorText = "Не удалось написать коментаарий";
+                    IsError = true;
+                    return;
+                }
+            }
+            else
+            {
+                ErrorText = "Заполните все поля";
+                IsError = true;
+                return;
             }
         }
     }
