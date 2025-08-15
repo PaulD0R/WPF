@@ -6,6 +6,7 @@ using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services;
 using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
@@ -15,6 +16,7 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiAuthenticationService _personService;
 
         private readonly INavigationService _navigationService;
+        private readonly ICheckCorrectServise _checkCorrectServise;
 
         private string? _name = string.Empty;
         private string? _password = string.Empty;
@@ -25,11 +27,12 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand PasswordCommand { get; set; }
         public ICommand SigninCommand { get; set; }
 
-        public SigninViewModel(ApiAuthenticationService personService, INavigationService navigationService)
+        public SigninViewModel(ApiAuthenticationService personService, INavigationService navigationService, ICheckCorrectServise checkCorrectServise)
         {
             _personService = personService;
 
             _navigationService = navigationService;
+            _checkCorrectServise = checkCorrectServise;
 
             NameCommand = new RelayCommand(x => Name = (string)x);
             PasswordCommand = new RelayCommand(x => Password = (string)x);
@@ -80,6 +83,12 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
+                if (!_checkCorrectServise.IsPassword(Password ?? string.Empty))
+                {
+                    ErrorText = "Некорректный пароль";
+                    IsError = true;
+                    return;
+                }
                 if (Name != string.Empty && Password != string.Empty)
                 {
                     var signinPerson = new SigninPerson

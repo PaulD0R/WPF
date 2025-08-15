@@ -28,7 +28,7 @@ namespace WPFServer.Controllers
         [HttpPost("Signin")]
         public async Task<IActionResult> Signin([FromBody] SigninRequest signinRequest)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.First().Errors.First().ErrorMessage);
 
             var person = await _userManager.Users.FirstOrDefaultAsync(x => x.UserName == signinRequest.Name);
             if (person == null) return Unauthorized("Пользователь не существует");
@@ -44,7 +44,7 @@ namespace WPFServer.Controllers
         [HttpPost("Signup")]
         public async Task<IActionResult> Signup([FromBody] NewPersonRequest newPersonRequest)
         {
-            if (!ModelState.IsValid) return BadRequest("Некорректный запрос");
+            if (!ModelState.IsValid) return BadRequest(ModelState.Values.First().Errors.First().ErrorMessage);
 
             var person = newPersonRequest.ToPerson();
             var createPerson = await _userManager.CreateAsync(person, newPersonRequest.Password);
@@ -66,7 +66,7 @@ namespace WPFServer.Controllers
             if (createPerson.Errors.Any(e => e.Code == "DuplicateUserName"))
                 return Conflict("Пользователь с таким именем уже существует");
 
-            return StatusCode(500);
+            return StatusCode(500, "Ошибка сервера");
         }
     }
 }

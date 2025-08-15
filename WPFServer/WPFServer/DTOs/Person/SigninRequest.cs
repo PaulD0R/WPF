@@ -4,11 +4,12 @@ namespace WPFServer.DTOs.Person
 {
     public class SigninRequest
     {
-        [Required]
-        [MinLength(3)]
+        [Required(ErrorMessage = "Некорректное имя")]
+        [MinLength(3, ErrorMessage = "Некорректная длинна имени")]
         public string? Name { get; set; }
-        [Required]
-        [MinLength(8)]
+        [Required(ErrorMessage = "Некорректный пароль")]
+        [MinLength(8, ErrorMessage = "Некорректная длинна пароля")]
+        [RegularExpression(@"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+=\[{\]};:<>|./?,-]).{8,}$", ErrorMessage = "Некорректный пароль")]
         public string? Password { get; set; }
     }
 }
