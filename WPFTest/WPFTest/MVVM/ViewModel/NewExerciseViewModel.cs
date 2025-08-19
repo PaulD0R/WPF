@@ -16,8 +16,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiSubjectService _subjectService;
 
         private readonly IMainViewModel _mainViewModel;
-        private readonly Lazy<INewSubjectViewModel> _newSubjectViewModel;
-        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
         private int? _subjectId = 1;
         private int? _number = 1;
@@ -32,14 +30,12 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand NewSubjectViewCommand { get; set; }
 
 
-        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, Lazy<INewSubjectViewModel> newSubjectViewModel, Lazy<IErrorViewModel> errorViewModel, IMainViewModel mainViewModel)
+        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, IMainViewModel mainViewModel)
         {
             _exerciseService = exerciseiService;
             _subjectService = subjectService;
 
             _mainViewModel = mainViewModel;
-            _newSubjectViewModel = newSubjectViewModel;
-            _errorViewModel = errorViewModel;
 
             FileCommand = new RelayCommand(_ => File = ZipFileStreamer.SetFile());
             NewSubjectViewCommand = new RelayCommand(_ => OpenNewSubject());
@@ -125,8 +121,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -168,8 +163,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -177,12 +171,11 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                _mainViewModel.ChangeCurrentView(_newSubjectViewModel.Value);
+                _mainViewModel.OpenNewSubjectView();
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }

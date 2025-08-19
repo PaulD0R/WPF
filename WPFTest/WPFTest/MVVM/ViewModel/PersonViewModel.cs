@@ -15,8 +15,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiExerciseService _exerciseService;
 
         private readonly IMainViewModel _mainViewModel;
-        private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
-        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
         private string? _id = null;
         private string? _name = string.Empty;
@@ -26,13 +24,11 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ChangeIsLikedCommand { get; set; }
         public ICommand ExerciseViewCommand { get; set; }
 
-        public PersonViewModel(ApiPersonService personService, ApiExerciseService exerciseService, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel, IMainViewModel mainViewModel)
+        public PersonViewModel(ApiPersonService personService, ApiExerciseService exerciseService, IMainViewModel mainViewModel)
         {
             _personService = personService;
             _exerciseService = exerciseService;
 
-            _exerciseViewModel = exerciseViewModel;
-            _errorViewModel = errorViewModel;
             _mainViewModel = mainViewModel;
 
             ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
@@ -97,8 +93,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -106,13 +101,11 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                _exerciseViewModel.Value.LoadExercise(id);
-                _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+                _mainViewModel.OpenExerciseView(id);
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }

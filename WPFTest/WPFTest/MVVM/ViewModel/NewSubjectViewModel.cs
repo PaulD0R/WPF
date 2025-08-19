@@ -12,7 +12,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiSubjectService _apiSubjectService;
 
         private IMainViewModel _mainViewModel;
-        private Lazy<IErrorViewModel> _errorViewModel;
 
         private string? _name = string.Empty;
         private int? _year = 1;
@@ -22,12 +21,11 @@ namespace WPFTest.MVVM.ViewModel
 
         public ICommand SaveCommand { get; set; }
 
-        public NewSubjectViewModel(ApiSubjectService apiSubjectService, IMainViewModel mainViewModel, Lazy<IErrorViewModel> errorViewModel)
+        public NewSubjectViewModel(ApiSubjectService apiSubjectService, IMainViewModel mainViewModel)
         {
             _apiSubjectService = apiSubjectService;
 
             _mainViewModel = mainViewModel;
-            _errorViewModel = errorViewModel;
 
             SaveCommand = new AsyncRelayCommand(async _ => await CreateNewSubject());
         }
@@ -115,8 +113,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }

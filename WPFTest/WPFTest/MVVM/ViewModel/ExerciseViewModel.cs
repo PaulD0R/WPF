@@ -15,8 +15,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiPersonService _personService;
 
         private readonly IMainViewModel _mainViewModel;
-        private readonly Lazy<ISubjectViewModel> _subjectViewModel;
-        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
         private int _id = 0;
         private int _subjectId = 0;
@@ -37,14 +35,12 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ChangeIsLikedCommand { get; set; }
         public ICommand CreateCommentCommand { get; set; }
 
-        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, IMainViewModel mainViewModel, Lazy<ISubjectViewModel> subjectViewModel, Lazy<IErrorViewModel> errorViewModel)
+        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, IMainViewModel mainViewModel)
         {
             _exerciseService = apiExerciseService;
             _personService = personService;
 
             _mainViewModel = mainViewModel;
-            _subjectViewModel = subjectViewModel;
-            _errorViewModel = errorViewModel;
 
             SubjectViewCommand = new RelayCommand(_ => OpenSubjectById(SubjectId));
             LoadTasksFileCommand = new AsyncRelayCommand(async _ => await GetExercisesTasksFileAsync());
@@ -204,8 +200,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -221,8 +216,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
 
                 return 0;
             }
@@ -230,10 +224,7 @@ namespace WPFTest.MVVM.ViewModel
 
         public void OpenSubjectById(int id)
         {
-            if (id <= 0) return;
-
-            _subjectViewModel.Value.LoadSubject(id);
-            _mainViewModel.ChangeCurrentView(_subjectViewModel.Value);
+            _mainViewModel.OpenSubject(id);
         }
 
         public async Task GetExercisesTasksFileAsync()
@@ -245,8 +236,7 @@ namespace WPFTest.MVVM.ViewModel
             } 
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -282,8 +272,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }

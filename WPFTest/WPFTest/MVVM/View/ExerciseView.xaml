@@ -184,11 +184,7 @@
                                  TextWrapping="Wrap"
                                  AcceptsReturn="True"
                                  VerticalScrollBarVisibility="Hidden"
-                                 BorderThickness="0">
-                            <i:Interaction.Behaviors>
-                                <behavior:TextChangedBehavior Command="{Binding NewCommentTextCommand}"/>
-                            </i:Interaction.Behaviors>
-                        </TextBox>
+                                 BorderThickness="0"/>
                     </StackPanel>
                 </Border>
                 

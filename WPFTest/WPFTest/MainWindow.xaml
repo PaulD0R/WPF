@@ -15,18 +15,26 @@
         AllowsTransparency="True"
         Title="First WPF" Height="567" Width="1008"
         Background="Transparent">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding HomeCommand}"/>
+            <i:InvokeCommandAction Command="{Binding RolesCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-        <converter:BooleanToWidthConverter x:Key="BooleanToWidthConverter"/>
     </Window.Resources>
 
     <Border Background="#272537"
-            CornerRadius="{Binding Radius}">
+            CornerRadius="15"
+            ClipToBounds="True"
+            x:Name="MainBorder">
         <Viewbox Stretch="Uniform">
             <Grid Height="567"
               Width="1008">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding IsMenuVisible, Converter={StaticResource BooleanToWidthConverter}}"
+                    <ColumnDefinition Width="12*"
                                       x:Name="Menu"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="52*"/>
@@ -37,7 +45,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Visibility="{Binding IsMenuVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Border Visibility="Visible"
+                        x:Name="MenuBorder">
                     <TextBlock Text="СвЭг"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Left"
@@ -47,7 +56,8 @@
                 </Border>
 
                 <StackPanel Grid.Row="1"
-                        Visibility="{Binding IsMenuVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            x:Name="MenuStack"
+                            Visibility="Visible">
                     <RadioButton Content="Профиль" 
                              Height="50"
                              FontSize="30"
@@ -67,8 +77,8 @@
 
                 <Button Grid.Column="1"
                         Grid.RowSpan="3"
-                        Command="{Binding ChangeMenuCommand}"
-                        Style="{StaticResource CloseMenuButtonTheme}"/>
+                        Style="{StaticResource CloseMenuButtonTheme}"
+                        Click="ChangeMenuButton_Click"/>
 
                 <StackPanel Orientation="Vertical"
                             Grid.Column="2">
@@ -80,8 +90,7 @@
                                 Width="25"
                                 BorderThickness="0"
                                 Background="Transparent"
-                                Click="ChangeSizeButton_Click"
-                                Command="{Binding ChangeWindowSizeCommand}">
+                                Click="ChangeSizeButton_Click">
                             <Image Source="/Images/FullSize.png"
                                    Width="20"
                                    Height="20"/>
@@ -113,9 +122,6 @@
                                      Foreground="DarkGray"
                                      Style="{StaticResource ModerTextBox}"
                                      Text="{Binding FindName}">
-                                <i:Interaction.Behaviors>
-                                    <behavior:TextChangedBehavior Command="{Binding FindNameCommand}"/>
-                                </i:Interaction.Behaviors>
                             </TextBox>
 
                             <Button Height="35"

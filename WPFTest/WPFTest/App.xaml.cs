@@ -43,17 +43,17 @@ namespace WPFTest
             services.AddTransient<IJwtService, JwtService>();
             services.AddTransient<ICheckCorrectServise, CheckCorrectService>();
 
-            services.AddTransient<IHomeViewModel, HomeViewModel>();
-            services.AddTransient<IDiscoverViewModel, DiscoverViewModel>();
+            services.AddSingleton<IHomeViewModel, HomeViewModel>();
+            services.AddSingleton<IDiscoverViewModel, DiscoverViewModel>();
             services.AddSingleton<IMainViewModel, MainViewModel>(); 
-            services.AddTransient<INewExerciseViewModel, NewExerciseViewModel>();
-            services.AddTransient<INewSubjectViewModel, NewSubjectViewModel>();
-            services.AddTransient<IAuthenticationViewModel, AuthenticationViewModel>(); 
-            services.AddTransient<ISignupViewModel, SignupViewModel>();
-            services.AddTransient<ISigninViewModel, SigninViewModel>();
+            services.AddSingleton<INewExerciseViewModel, NewExerciseViewModel>();
+            services.AddSingleton<INewSubjectViewModel, NewSubjectViewModel>();
+            services.AddSingleton<IAuthenticationViewModel, AuthenticationViewModel>(); 
+            services.AddSingleton<ISignupViewModel, SignupViewModel>();
+            services.AddSingleton<ISigninViewModel, SigninViewModel>();
             services.AddSingleton<IExerciseViewModel, ExerciseViewModel>();
             services.AddSingleton<ISubjectViewModel, SubjectViewModel>();
-            services.AddTransient<IPersonViewModel, PersonViewModel>();
+            services.AddSingleton<IPersonViewModel, PersonViewModel>();
             services.AddSingleton<IErrorViewModel, ErrorViewModel>();
 
             services.AddLazy<IHomeViewModel>();
@@ -69,8 +69,8 @@ namespace WPFTest
             services.AddLazy<ISigninViewModel>();
             services.AddLazy<ISignupViewModel>();
 
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<AuthenticationWindow>();
+            services.AddTransient<MainWindow>();
+            services.AddTransient<AuthenticationWindow>();
 
             services.AddTransient<HomeView>();
             services.AddTransient<DiscoverView>();

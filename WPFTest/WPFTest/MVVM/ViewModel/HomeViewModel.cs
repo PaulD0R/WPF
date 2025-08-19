@@ -19,9 +19,7 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiExerciseService _exerciseService;
         private readonly ApiAuthenticationService _authenticationService;
 
-        private readonly Lazy<IMainViewModel> _mainViewModel;
-        private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
-        private readonly Lazy<IErrorViewModel> _errorViewModel;
+        private readonly IMainViewModel _mainViewModel;
 
         private readonly INavigationService _navigationService;
 
@@ -37,7 +35,7 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ExerciseViewCommand { get; set; }
         public ICommand LogoutCommand { get; set; }
 
-        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, ApiAuthenticationService authenticationService, INavigationService navigationService, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel, Lazy<IMainViewModel> mainViewModel)
+        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, ApiAuthenticationService authenticationService, INavigationService navigationService, IMainViewModel mainViewModel)
         {
             _personService = personService;
             _exerciseService = exerciseService;
@@ -45,8 +43,6 @@ namespace WPFTest.MVVM.ViewModel
 
             _navigationService = navigationService;
 
-            _exerciseViewModel = exerciseViewModel;
-            _errorViewModel = errorViewModel;
             _mainViewModel = mainViewModel;
 
             ChangeImageCommand = new AsyncRelayCommand(async _ => await ChangeImage());
@@ -122,8 +118,7 @@ namespace WPFTest.MVVM.ViewModel
             } 
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -136,8 +131,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -160,8 +154,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -169,13 +162,11 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                _exerciseViewModel.Value.LoadExercise(id);
-                _mainViewModel.Value.ChangeCurrentView(_exerciseViewModel.Value);
+                 _mainViewModel.OpenExerciseView(id);
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -193,8 +184,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }

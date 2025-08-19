@@ -1,7 +1,6 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
-using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
@@ -21,12 +20,12 @@ namespace WPFTest.MVVM.ViewModel
         private string? _errorText = string.Empty;
         private bool? _isntBlock = true;
 
-        private readonly Lazy<IAuthenticationViewModel> _authenticationViewModel;
+        private readonly IAuthenticationViewModel _authenticationViewModel;
 
         public ICommand PasswordCommand { get; set; }
         public ICommand SignupCommand { get; set; }
 
-        public SignupViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, Lazy<IAuthenticationViewModel> authenticationViewModel)
+        public SignupViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, IAuthenticationViewModel authenticationViewModel)
         {
             _checkCorrectServise = checkCorrectServise;
             _authenticationViewModel = authenticationViewModel;
@@ -132,7 +131,7 @@ namespace WPFTest.MVVM.ViewModel
                         Email = string.Empty;
                         Password = string.Empty;
 
-                        _authenticationViewModel.Value.OpenMainApplication(token);
+                        _authenticationViewModel.OpenMainApplication(token);
                     }
                     else
                     {

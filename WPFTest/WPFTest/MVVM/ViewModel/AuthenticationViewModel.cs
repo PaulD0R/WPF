@@ -40,7 +40,6 @@ namespace WPFTest.MVVM.ViewModel
             _navigationService.CloseAnotherWindow<AuthenticationWindow>();
 
             CheckToken();
-            ChangeCurrentView(_signupViewModel.Value);
         }
 
         public object? CurentView

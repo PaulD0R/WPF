@@ -3,7 +3,6 @@
     static class StaticData
     {
         public const int NUMBER_OF_ELEMENTS_PER_PAGE = 20;
-        public const int MAIN_WINDOW_RADIUS = 15;
 
         public const string EXERCISE_ROUDE = @"https://localhost:7145/WPF/Exercises/";
         public const string SUBJECT_ROUDE = @"https://localhost:7145/WPF/Subjects/";

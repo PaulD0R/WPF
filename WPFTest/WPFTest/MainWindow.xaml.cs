@@ -9,6 +9,10 @@ namespace WPFTest
     /// </summary>
     public partial class MainWindow : Window
     {
+        private CornerRadius MAX_RADIUS = new(0);
+        private CornerRadius MIN_RADIUS = new(15);
+
+        private bool _isMenuVisability = true;
         public MainWindow()
         {
             DataContext = App.ServiceProvider?.GetRequiredService<IMainViewModel>();
@@ -24,12 +28,25 @@ namespace WPFTest
         {
             if (this.WindowState == WindowState.Normal)
             {
+                MainBorder.CornerRadius = MAX_RADIUS;
                 this.WindowState = WindowState.Maximized;
             }
             else
             {
+                MainBorder.CornerRadius = MIN_RADIUS;
                 this.WindowState = WindowState.Normal;
             }
+        }
+
+        private void ChangeMenuButton_Click(Object sender, RoutedEventArgs e)
+        {
+            _isMenuVisability = !_isMenuVisability;
+
+            MenuBorder.Visibility = _isMenuVisability ? Visibility.Visible : Visibility.Hidden;
+            MenuStack.Visibility = _isMenuVisability ? Visibility.Visible : Visibility.Hidden;
+
+            Menu.Width = _isMenuVisability ? 
+                new GridLength(12, GridUnitType.Star) : new GridLength(0);
         }
     }
 }

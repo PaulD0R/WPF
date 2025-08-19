@@ -14,8 +14,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiExerciseService _exerciseService;
 
         private readonly IMainViewModel _mainViewModel;
-        private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
-        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
         private ObservableCollection<LightExercise> _exercises = [];
         private List<PageButtonData> _pages = [];
@@ -25,12 +23,10 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ExerciseViewCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
 
-        public DiscoverViewModel(ApiExerciseService exerciseService, IMainViewModel mainViewModel, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel)
+        public DiscoverViewModel(ApiExerciseService exerciseService, IMainViewModel mainViewModel)
         {
             _exerciseService = exerciseService;
             _mainViewModel = mainViewModel;
-            _exerciseViewModel = exerciseViewModel;
-            _errorViewModel = errorViewModel;
 
             ChangePage = new RelayCommand(x => {
                 PageNumber = (int)x;
@@ -79,10 +75,10 @@ namespace WPFTest.MVVM.ViewModel
             {
                 var exercises = await _exerciseService.GetByPageAsync(_pageNumer);
                 Exercises = new ObservableCollection<LightExercise>(exercises);
-            } catch (ApiExeption ex)
+            } 
+            catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -108,8 +104,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -117,13 +112,11 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                _exerciseViewModel.Value.LoadExercise(id);
-                _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+                _mainViewModel.OpenExerciseView(id);
             } 
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }

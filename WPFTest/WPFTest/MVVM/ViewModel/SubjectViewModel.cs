@@ -13,8 +13,6 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiSubjectService _subjectService;
 
         private readonly IMainViewModel _mainViewModel;
-        private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
-        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
 
         private string? _name = string.Empty;
@@ -25,11 +23,9 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ExerciseViewCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
 
-        public SubjectViewModel(ApiSubjectService subjectService, IMainViewModel mainViewModel, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel, ApiExerciseService exerciseService)
+        public SubjectViewModel(ApiSubjectService subjectService, IMainViewModel mainViewModel, ApiExerciseService exerciseService)
         {
             _mainViewModel = mainViewModel;
-            _exerciseViewModel = exerciseViewModel;
-            _errorViewModel = errorViewModel;
 
             _subjectService = subjectService;
             _exerciseService = exerciseService;
@@ -91,8 +87,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
 
@@ -100,13 +95,11 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                _exerciseViewModel.Value.LoadExercise(id);
-                _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+                _mainViewModel.OpenExerciseView(id);
             }
             catch (ApiExeption ex)
             {
-                _errorViewModel.Value.LoadError(ex.Message);
-                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+                _mainViewModel.OpenErrorView(ex.Message);
             }
         }
     }
