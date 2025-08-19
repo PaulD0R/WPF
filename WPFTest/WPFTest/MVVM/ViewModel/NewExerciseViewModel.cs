@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Exeptions;
 using WPFTest.FileStreamers;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.Model.Files;
@@ -16,33 +17,29 @@ namespace WPFTest.MVVM.ViewModel
 
         private readonly IMainViewModel _mainViewModel;
         private readonly Lazy<INewSubjectViewModel> _newSubjectViewModel;
+        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
-        private int? _subjectId;
-        private int? _number;
-        private string? _task;
-        private byte[]? _file;
-        private ICollection<LightSubject>? _subjects;
-        private bool? _isError;
-        private string? _errorText;
+        private int? _subjectId = 1;
+        private int? _number = 1;
+        private string? _task = string.Empty;
+        private byte[]? _file = [];
+        private ICollection<LightSubject>? _subjects = [];
+        private bool? _isError = false;
+        private string? _errorText = string.Empty;
 
         public ICommand FileCommand { get; set; }
         public ICommand SaveCommand { get; set; }
         public ICommand NewSubjectViewCommand { get; set; }
 
 
-        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, Lazy<INewSubjectViewModel> newSubjectViewModel, IMainViewModel mainViewModel)
+        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, Lazy<INewSubjectViewModel> newSubjectViewModel, Lazy<IErrorViewModel> errorViewModel, IMainViewModel mainViewModel)
         {
             _exerciseService = exerciseiService;
             _subjectService = subjectService;
+
             _mainViewModel = mainViewModel;
             _newSubjectViewModel = newSubjectViewModel;
-
-            _subjectId = 1;
-            _number = 1;
-            _task = string.Empty;
-            _file = null;
-            _isError = false;
-            _errorText = string.Empty;
+            _errorViewModel = errorViewModel;
 
             FileCommand = new RelayCommand(_ => File = ZipFileStreamer.SetFile());
             NewSubjectViewCommand = new RelayCommand(_ => OpenNewSubject());
@@ -122,47 +119,71 @@ namespace WPFTest.MVVM.ViewModel
 
         public async void LoadSubjects()
         {
-            Subjects = await _subjectService.GetAllAsync();
+            try
+            {
+                Subjects = await _subjectService.GetAllAsync();
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public async Task CreateNewExerciseAsync()
         {
-            if (File != null && SubjectId != null && Task != string.Empty && Number != null)
+            try
             {
-                var exercise = new NewExercise
+                if (File != null && SubjectId != null && Task != string.Empty && Number != null)
                 {
-                    SubjectId = SubjectId,
-                    Number = Number,
-                    Task = Task,
-                    Files = new ExercisesTasksFile()
+                    var exercise = new NewExercise
                     {
-                        TasksFile = File
+                        SubjectId = SubjectId,
+                        Number = Number,
+                        Task = Task,
+                        Files = new ExercisesTasksFile()
+                        {
+                            TasksFile = File
+                        }
+                    };
+
+                    if (!await _exerciseService.AddExerciseAsync(exercise))
+                    {
+                        ErrorText = "Неудалось создать упражнение";
+                        IsError = true;
+                        return;
                     }
-                };
 
-                if(!await _exerciseService.AddExerciseAsync(exercise))
-                {
-                    ErrorText = "Неудалось создать упражнение";
-                    IsError = true;
-                    return;
+                    SubjectId = 1;
+                    Number = 1;
+                    Task = string.Empty;
+                    File = null;
+                    IsError = false;
                 }
-
-                SubjectId = 1;
-                Number = 1;
-                Task = string.Empty;
-                File = null;
-                IsError = false;
+                else
+                {
+                    ErrorText = "Заполните все поля";
+                    IsError = true;
+                }
             }
-            else
+            catch (ApiExeption ex)
             {
-                ErrorText = "Заполните все поля";
-                IsError = true;
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
             }
         }
 
         public void OpenNewSubject()
         {
-            _mainViewModel.ChangeCurrentView(_newSubjectViewModel.Value);
+            try
+            {
+                _mainViewModel.ChangeCurrentView(_newSubjectViewModel.Value);
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
     }
 }

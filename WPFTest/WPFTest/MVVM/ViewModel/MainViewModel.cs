@@ -1,5 +1,4 @@
 ﻿using System.Windows.Input;
-using System.Windows.Media;
 using WPFTest.Core;
 using WPFTest.Data;
 using WPFTest.MVVM.ViewModel.Interfaces;
@@ -12,16 +11,14 @@ namespace WPFTest.MVVM.ViewModel
         private readonly INavigationService _navigationService;
         private readonly IJwtService _jwtService;
 
-        private ICollection<string>? _roles;
-        private object _currentView;
-        private bool _isMenuVisible;
-        private bool? _isDiscover;
-        private bool? _isHome;
+        private ICollection<string>? _roles = [];
+        private object? _currentView = null;
+        private bool _isMenuVisible = true;
+        private bool? _isDiscover = false;
+        private bool? _isHome = true;
         private bool? _isAddVisable;
-        private ImageSource? _closeImage;
-        private ImageSource? _fullSizeImage;
-        private int _radius;
-        private string? _findName;
+        private int _radius = StaticData.MAIN_WINDOW_RADIUS;
+        private string? _findName = string.Empty;
 
         private readonly Lazy<IHomeViewModel> _homeViewModel;
         private readonly Lazy<IDiscoverViewModel> _discoverViewModel;
@@ -45,12 +42,6 @@ namespace WPFTest.MVVM.ViewModel
             _discoverViewModel = discoverViewModel;
             _newExercisesViewModel = newExercisesViewModel;
             _personViewModel = personViewModel;
-
-            _currentView = _homeViewModel.Value;
-            _isMenuVisible = true;
-            _isDiscover = false;
-            _isHome = true;
-            _radius = StaticData.MAIN_WINDOW_RADIUS;
 
             HomeCommand = new RelayCommand(_ =>
             {
@@ -81,29 +72,10 @@ namespace WPFTest.MVVM.ViewModel
             _navigationService.CloseAnotherWindow<MainWindow>();
 
             LoadRoles();
+            ChangeCurrentView(_homeViewModel.Value);
         }
 
-        public ImageSource? CloseImage
-        {
-            get => _closeImage;
-            set
-            {
-                _closeImage = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ImageSource? FullSizeImage
-        {
-            get => _fullSizeImage;
-            set
-            {
-                _fullSizeImage = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public object CurrentView
+        public object? CurrentView
         {
             get => _currentView; 
             set 
@@ -176,8 +148,8 @@ namespace WPFTest.MVVM.ViewModel
         public void ChangeCurrentView(object currentView)
         {
             CurrentView = currentView;
-            IsHome = currentView is HomeViewModel;
-            IsDiscover = currentView is DiscoverViewModel;
+            IsHome = currentView is IHomeViewModel;
+            IsDiscover = currentView is IDiscoverViewModel;
         }
 
         public void LoadRoles()

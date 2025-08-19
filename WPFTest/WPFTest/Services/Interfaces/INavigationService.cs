@@ -6,5 +6,6 @@ namespace WPFTest.Services.Interfaces
     {
         void ShowWindow<T>() where T : Window;
         void CloseAnotherWindow<T>() where T : Window;
+        void ShowAndClothesAnotherWindow<T>() where T : Window;
     }
 }

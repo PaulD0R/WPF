@@ -11,37 +11,28 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class SignupViewModel : ObserverItem, ISignupViewModel
     {
-        private readonly ApiAuthenticationService _personService;
-
-        private readonly INavigationService _navigationService;
+        private readonly ApiAuthenticationService _authenticationService;
         private readonly ICheckCorrectServise _checkCorrectServise;
 
-        private string? _name;
-        private string? _email;
-        private string? _password;
-        private bool? _isError;
-        private string? _errorText;
+        private string? _name = string.Empty;
+        private string? _email = string.Empty;
+        private string? _password = string.Empty;
+        private bool? _isError = false;
+        private string? _errorText = string.Empty;
+        private bool? _isntBlock = true;
 
-        public ICommand NameCommand { get; set; }
-        public ICommand EmailCommand { get; set; }
+        private readonly Lazy<IAuthenticationViewModel> _authenticationViewModel;
+
         public ICommand PasswordCommand { get; set; }
         public ICommand SignupCommand { get; set; }
 
-        public SignupViewModel(ApiAuthenticationService personService, INavigationService navigationService, ICheckCorrectServise checkCorrectServise)
+        public SignupViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, Lazy<IAuthenticationViewModel> authenticationViewModel)
         {
-            _navigationService = navigationService;
             _checkCorrectServise = checkCorrectServise;
+            _authenticationViewModel = authenticationViewModel;
 
-            _personService = personService;
+            _authenticationService = authenticationService;
 
-            _name = string.Empty;
-            _email = string.Empty;
-            _password = string.Empty;
-            _isError = false;
-            _errorText = string.Empty;
-
-            NameCommand = new RelayCommand(x => Name = (string)x);
-            EmailCommand = new RelayCommand(x => Email = (string)x);
             PasswordCommand = new RelayCommand(x => Password = (string)x);
             SignupCommand = new AsyncRelayCommand(async _ => await Signup());
         }
@@ -72,6 +63,7 @@ namespace WPFTest.MVVM.ViewModel
             set
             {
                 _password = value;
+                OnPropertyChanged();
             }
         }
 
@@ -91,6 +83,16 @@ namespace WPFTest.MVVM.ViewModel
             set
             {
                 _errorText= value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool? IsntBlock
+        {
+            get => _isntBlock;
+            set
+            {
+                _isntBlock = value;
                 OnPropertyChanged();
             }
         }
@@ -119,12 +121,18 @@ namespace WPFTest.MVVM.ViewModel
                         Email = Email,
                         Password = Password
                     };
-                    var person = await _personService.Signup(signupPerson);
 
-                    if (person != null)
+                    IsntBlock = false;
+                    var token = await _authenticationService.Signup(signupPerson);
+                    IsntBlock = true;
+
+                    if (token != null)
                     {
-                        StaticData.TOKEN = person.Token ?? string.Empty;
-                        _navigationService.ShowWindow<MainWindow>();
+                        Name = string.Empty;
+                        Email = string.Empty;
+                        Password = string.Empty;
+
+                        _authenticationViewModel.Value.OpenMainApplication(token);
                     }
                     else
                     {

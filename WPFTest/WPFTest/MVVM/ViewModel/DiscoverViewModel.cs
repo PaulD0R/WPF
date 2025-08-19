@@ -5,6 +5,7 @@ using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.MVVM.Model.Exercise;
+using WPFTest.Exeptions;
 
 namespace WPFTest.MVVM.ViewModel
 {
@@ -14,24 +15,22 @@ namespace WPFTest.MVVM.ViewModel
 
         private readonly IMainViewModel _mainViewModel;
         private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
+        private readonly Lazy<IErrorViewModel> _errorViewModel;
 
-        private ObservableCollection<LightExercise> _exercises;
-        private List<PageButtonData> _pages;
-        private int _pageNumer;
+        private ObservableCollection<LightExercise> _exercises = [];
+        private List<PageButtonData> _pages = [];
+        private int _pageNumer = 1;
 
         public ICommand ChangePage { get; set; }
         public ICommand ExerciseViewCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
 
-        public DiscoverViewModel(ApiExerciseService exerciseService, IMainViewModel mainViewModel, Lazy<IExerciseViewModel> exerciseViewModel)
+        public DiscoverViewModel(ApiExerciseService exerciseService, IMainViewModel mainViewModel, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel)
         {
             _exerciseService = exerciseService;
             _mainViewModel = mainViewModel;
             _exerciseViewModel = exerciseViewModel;
-
-            _pageNumer = 1;
-            _pages = [];
-            _exercises = [];
+            _errorViewModel = errorViewModel;
 
             ChangePage = new RelayCommand(x => {
                 PageNumber = (int)x;
@@ -76,33 +75,56 @@ namespace WPFTest.MVVM.ViewModel
 
         public async void LoadExercises()
         {
-            var exercises = await _exerciseService.GetByPageAsync(_pageNumer);
-            Exercises = new ObservableCollection<LightExercise>(exercises);
+            try
+            {
+                var exercises = await _exerciseService.GetByPageAsync(_pageNumer);
+                Exercises = new ObservableCollection<LightExercise>(exercises);
+            } catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public async void LoadPages()
         {
-            var pageCount = (double)await _exerciseService.GetCountAsync()
-                / (double)StaticData.NUMBER_OF_ELEMENTS_PER_PAGE;
-            var pages = new List<PageButtonData>();
-
-            if (pageCount > 0)
+            try
             {
-                for (var i = 0; i < Math.Ceiling(pageCount); i++)
+                var pageCount = (double)await _exerciseService.GetCountAsync()
+                    / (double)StaticData.NUMBER_OF_ELEMENTS_PER_PAGE;
+                var pages = new List<PageButtonData>();
+
+                if (pageCount > 0)
                 {
-                    pages.Add(new PageButtonData(i + 1, false));
+                    for (var i = 0; i < Math.Ceiling(pageCount); i++)
+                    {
+                        pages.Add(new PageButtonData(i + 1, false));
+                    }
+
+                    pages[PageNumber - 1].IsChecked = true;
                 }
 
-                pages[PageNumber - 1].IsChecked = true;
+                Pages = pages;
             }
-
-            Pages = pages;
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public void OpenExerciseById(int id)
         {
-            _exerciseViewModel.Value.LoadExercise(id);
-            _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+            try
+            {
+                _exerciseViewModel.Value.LoadExercise(id);
+                _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+            } 
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
     }
 }

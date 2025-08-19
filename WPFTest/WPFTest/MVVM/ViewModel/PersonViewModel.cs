@@ -18,9 +18,9 @@ namespace WPFTest.MVVM.ViewModel
         private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
         private readonly Lazy<IErrorViewModel> _errorViewModel;
 
-        private string? _id;
-        private string? _name;
-        private byte[]? _image;
+        private string? _id = null;
+        private string? _name = string.Empty;
+        private byte[]? _image = [];
         private ObservableCollection<LightExercise>? _exercises;
 
         public ICommand ChangeIsLikedCommand { get; set; }
@@ -93,7 +93,7 @@ namespace WPFTest.MVVM.ViewModel
                 Id = person.Id;
                 Name = person.Name;
                 Image = person.Image;
-                Exercises = new ObservableCollection<LightExercise>(person.Exercises);
+                Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
             }
             catch (ApiExeption ex)
             {
@@ -104,8 +104,16 @@ namespace WPFTest.MVVM.ViewModel
 
         public void OpenExerciseById(int id)
         {
-            _exerciseViewModel.Value.LoadExercise(id);
-            _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+            try
+            {
+                _exerciseViewModel.Value.LoadExercise(id);
+                _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
     }
 }

@@ -8,13 +8,13 @@
         xmlns:viewModel="clr-namespace:WPFTest.MVVM.ViewModel"
         xmlns:converter="clr-namespace:WPFTest.Converters" 
         xmlns:behavior="clr-namespace:WPFTest.Behaviors"
+        xmlns:viewModels="clr-namespace:WPFTest.MVVM.ViewModel.Interfaces"
         mc:Ignorable="d"
         ResizeMode="NoResize"
         WindowStyle="None"
         AllowsTransparency="True"
         Title="First WPF" Height="567" Width="1008"
         Background="Transparent">
-
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <converter:BooleanToWidthConverter x:Key="BooleanToWidthConverter"/>

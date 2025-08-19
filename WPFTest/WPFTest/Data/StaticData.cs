@@ -10,6 +10,20 @@
         public const string AUTHENTICATION_ROUDE = @"https://localhost:7145/WPF/Authentication/";
         public const string PERSON_ROUDE = @"https://localhost:7145/WPF/Persons/";
 
-        public static string TOKEN { get; set; } = string.Empty;
+        private static string _token { get; set; } = string.Empty;
+        public static EventHandler<string> OnTokenChanged { get; set; }
+
+        public static string TOKEN
+        {
+            get => _token;
+            set
+            {
+                if (_token != value)
+                {
+                    _token = value;
+                    OnTokenChanged?.Invoke(null, value);
+                }
+            }
+        }
     }
 }

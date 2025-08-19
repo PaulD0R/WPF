@@ -18,5 +18,15 @@ namespace WPFTest.Services
                 window.Close();
             }
         }
+
+        public void ShowAndClothesAnotherWindow<T>() where T : Window
+        {
+            var windows = Application.Current.Windows.OfType<Window>();
+            ShowWindow<T>();
+            foreach (var window in windows)
+            {
+                window.Close();
+            }
+        }
     }
 }

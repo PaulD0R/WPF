@@ -2,11 +2,14 @@
 using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.FileStreamers;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.Model.Files;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services;
+using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
@@ -14,26 +17,33 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiPersonService _personService;
         private readonly ApiExerciseService _exerciseService;
+        private readonly ApiAuthenticationService _authenticationService;
 
         private readonly Lazy<IMainViewModel> _mainViewModel;
         private readonly Lazy<IExerciseViewModel> _exerciseViewModel;
         private readonly Lazy<IErrorViewModel> _errorViewModel;
 
-        private string? _id;
-        private string? _name;
-        private string? _email;
-        private byte[]? _image;
-        private ObservableCollection<LightExercise>? _exercises;
+        private readonly INavigationService _navigationService;
+
+        private string? _id = string.Empty;
+        private string? _name = string.Empty;
+        private string? _email = string.Empty;
+        private byte[]? _image = [];
+        private ObservableCollection<LightExercise>? _exercises = [];
 
         public ICommand ChangeImageCommand { get; set; }
         public ICommand DeleteImageCommand { get; set; }
         public ICommand ChangeIsLikedCommand { get; set; }
         public ICommand ExerciseViewCommand { get; set; }
+        public ICommand LogoutCommand { get; set; }
 
-        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel, Lazy<IMainViewModel> mainViewModel)
+        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, ApiAuthenticationService authenticationService, INavigationService navigationService, Lazy<IExerciseViewModel> exerciseViewModel, Lazy<IErrorViewModel> errorViewModel, Lazy<IMainViewModel> mainViewModel)
         {
             _personService = personService;
             _exerciseService = exerciseService;
+            _authenticationService = authenticationService;
+
+            _navigationService = navigationService;
 
             _exerciseViewModel = exerciseViewModel;
             _errorViewModel = errorViewModel;
@@ -41,6 +51,7 @@ namespace WPFTest.MVVM.ViewModel
 
             ChangeImageCommand = new AsyncRelayCommand(async _ => await ChangeImage());
             DeleteImageCommand = new AsyncRelayCommand(async _ => await DeleteImage());
+            LogoutCommand = new AsyncRelayCommand(async _ => await  Logout());
             ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
             ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int)x));
 
@@ -99,19 +110,35 @@ namespace WPFTest.MVVM.ViewModel
 
         public async Task ChangeImage()
         {
-            var newImageFile = new ImageNewFile
+            try
             {
-                Image = ImgFileStreamer.SetFile()
-            };
+                var newImageFile = new ImageNewFile
+                {
+                    Image = ImgFileStreamer.SetFile()
+                };
 
-            if (newImageFile.Image != null) 
-                Image = (await _personService.ChangePrivateImageAsync(newImageFile))?.Image;
+                if (newImageFile.Image != null)
+                    Image = (await _personService.ChangePrivateImageAsync(newImageFile))?.Image;
+            } 
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public async Task DeleteImage()
         {
-            if (await _personService.DeletePrivateImageAsync())
-                Image = null;
+            try
+            {
+                if (await _personService.DeletePrivateImageAsync())
+                    Image = null;
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public async void LoadPerson()
@@ -129,7 +156,7 @@ namespace WPFTest.MVVM.ViewModel
                 Name = person.Name;
                 Email = person.Email;
                 Image = person.Image;
-                Exercises = new ObservableCollection<LightExercise>(person.Exercises);
+                Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
             }
             catch (ApiExeption ex)
             {
@@ -140,8 +167,35 @@ namespace WPFTest.MVVM.ViewModel
 
         public void OpenExerciseById(int id)
         {
-            _exerciseViewModel.Value.LoadExercise(id);
-            _mainViewModel.Value.ChangeCurrentView(_exerciseViewModel.Value);
+            try
+            {
+                _exerciseViewModel.Value.LoadExercise(id);
+                _mainViewModel.Value.ChangeCurrentView(_exerciseViewModel.Value);
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+            }
+        }
+
+        public async Task Logout()
+        {
+            try
+            {
+                if (await _authenticationService.Logout())
+                {
+                    TokenStorageService.ClearRefreshToken();
+                    StaticData.TOKEN = string.Empty;
+
+                    _navigationService.ShowAndClothesAnotherWindow<AuthenticationWindow>();
+                }
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.Value.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
     }
 }

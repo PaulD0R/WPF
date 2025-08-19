@@ -359,6 +359,31 @@ namespace WPFServer.Migrations
                     b.ToTable("PersonsFiles");
                 });
 
+            modelBuilder.Entity("WPFServer.Models.RefreshToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("LiveTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PersonId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Token")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PersonId");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasFilter("[Token] IS NOT NULL");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("WPFServer.Models.Subject", b =>
                 {
                     b.Property<int>("Id")
@@ -384,6 +409,10 @@ namespace WPFServer.Migrations
             modelBuilder.Entity("WPFServer.Models.Person", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.HasIndex("UserName")
+                        .IsUnique()
+                        .HasFilter("[UserName] IS NOT NULL");
 
                     b.HasDiscriminator().HasValue("Person");
                 });
@@ -496,6 +525,15 @@ namespace WPFServer.Migrations
                     b.HasOne("WPFServer.Models.Person", "Person")
                         .WithOne("Files")
                         .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId");
+
+                    b.Navigation("Person");
+                });
+
+            modelBuilder.Entity("WPFServer.Models.RefreshToken", b =>
+                {
+                    b.HasOne("WPFServer.Models.Person", "Person")
+                        .WithMany()
+                        .HasForeignKey("PersonId");
 
                     b.Navigation("Person");
                 });

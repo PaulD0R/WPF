@@ -4,5 +4,8 @@
     {
         public void LoadPerson();
         void OpenExerciseById(int id);
+        Task Logout();
+        public Task DeleteImage();
+        public Task ChangeImage();
     }
 }

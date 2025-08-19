@@ -26,13 +26,13 @@
                              IsChecked="True"
                              Style="{StaticResource ChangeButtonTheme}"
                              Height="50"
-                             Command="{Binding SigninCommand}"/>
+                             Command="{Binding SignupCommand}"/>
                 <RadioButton Grid.Column="1"
                              Content="Вход"
                              Foreground="White"
                              FontSize="30"
                              Style="{StaticResource ChangeButtonTheme}"
-                             Command="{Binding SignupCommand}"/>
+                             Command="{Binding SigninCommand}"/>
             </Grid>
 
             <ContentControl VerticalAlignment="Stretch"

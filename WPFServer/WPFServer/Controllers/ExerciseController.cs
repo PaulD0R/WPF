@@ -29,12 +29,12 @@ namespace WPFServer.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var personName = User.GetUserName();
+            var personId = User.GetId();
             var exercises = await _exercisesRepository.GetAllAsync();
 
-            if (personName == null) return Unauthorized("Не авторизирован");
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personName)).ToList();
+            var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personId)).ToList();
 
             return Ok(exercisesDtos);
         }
@@ -50,12 +50,12 @@ namespace WPFServer.Controllers
         public async Task<IActionResult> GetByPage([FromRoute] int page)
         {
             var exercises = await _exercisesRepository.GetByPageAsync(page);
-            var personName = User.GetUserName();
+            var personId = User.GetId();
 
-            if (personName == null) return Unauthorized("Не авторизирован");
+            if (personId == null) return Unauthorized("Не авторизирован");
             if (exercises == null) return NotFound("Упражнение не найдено");
 
-            var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personName)).ToList();
+            var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personId)).ToList();
 
             return Ok(exercisesDtos);
         }
@@ -74,12 +74,12 @@ namespace WPFServer.Controllers
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var exercise = await _exercisesRepository.GetByIdAsync(id);
-            var personName = User.GetUserName();
+            var personId = User.GetId();
 
-            if (personName == null) return Unauthorized("Не авторизирован");
+            if (personId == null) return Unauthorized("Не авторизирован");
             if (exercise == null) return NotFound("Упражнение не найдено");
 
-            return Ok(exercise.ToFullExerciseDto(personName));
+            return Ok(exercise.ToFullExerciseDto(personId));
         }
 
         [HttpPost("Add")]
@@ -108,15 +108,11 @@ namespace WPFServer.Controllers
         [HttpPut("{id:int}/isLiked")]
         public async Task<IActionResult> ChangeIsLicked([FromRoute] int id)
         {
-            var personName = User.GetUserName();
+            var personId = User.GetId();
 
-            if (personName == null) return NotFound("Упражнение не найдено");
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            var person = await _personRepository.GetByNameAsync(personName);
-            
-            if (person == null) return Unauthorized("Не авторизирован");
-
-            var isLicked = await _exercisesRepository.ChangeIsLikedAsync(person, id);
+            var isLicked = await _exercisesRepository.ChangeIsLikedAsync(personId, id);
             return Ok(new { isLiked = isLicked});
         }
 
@@ -124,12 +120,12 @@ namespace WPFServer.Controllers
         public async Task<IActionResult> AddComment([FromRoute] int id, [FromBody] CommentRequest request)
         {
             var exercise = await _exercisesRepository.GetByIdAsync(id);
-            var userName = User.GetUserName();
+            var userId = User.GetId();
 
-            if (userName == null) return Unauthorized("Не авторизирован");
+            if (userId == null) return Unauthorized("Не авторизирован");
             if (exercise == null) return NotFound("Упражнение не найдено");
 
-            var person = await _personRepository.GetByNameAsync(userName);
+            var person = await _personRepository.GetByIdAsync(userId);
 
             if (person == null) return NotFound("Пользователь не найден");
 

@@ -90,8 +90,7 @@
                      VerticalAlignment="Center"
                      BorderThickness="0"
                      MaxLength="15"
-                     PasswordChar="•"
-                     >
+                     PasswordChar="•">
             <i:Interaction.Behaviors>
                 <behavior:PasswordBoxBehavior Password="{Binding Password}"/>
             </i:Interaction.Behaviors>
@@ -103,6 +102,7 @@
                 Grid.ColumnSpan="2"
                 FontSize="25"
                 Height="50"
-                Command="{Binding SignupCommand}"/>
+                Command="{Binding SignupCommand}"
+                IsEnabled="{Binding IsntBlock}"/>
     </Grid>
 </UserControl>

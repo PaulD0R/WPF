@@ -33,12 +33,12 @@ namespace WPFServer.Controllers
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var subject = await _subjectRepository.GetByIdAsync(id);
-            var personName = User.GetUserName();
+            var personId = User.GetId();
 
             if (subject == null) return NotFound("Предмет не найден");
-            if (personName == null) return Unauthorized("Не авторизирован");
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            return Ok(subject.ToSubjectDto(personName));
+            return Ok(subject.ToSubjectDto(personId));
         }
 
         [HttpPost("Add")]

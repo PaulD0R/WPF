@@ -17,9 +17,9 @@ namespace WPFTest.MVVM.ViewModel
         private readonly Lazy<IErrorViewModel> _errorViewModel;
 
 
-        private string? _name;
-        private int? _year;
-        private string? _description;
+        private string? _name = string.Empty;
+        private int? _year = null;
+        private string? _description = string.Empty;
         private ICollection<LightExercise>? _exercises;
 
         public ICommand ExerciseViewCommand { get; set; }
@@ -98,8 +98,16 @@ namespace WPFTest.MVVM.ViewModel
 
         public void OpenExerciseById(int id)
         {
-            _exerciseViewModel.Value.LoadExercise(id);
-            _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+            try
+            {
+                _exerciseViewModel.Value.LoadExercise(id);
+                _mainViewModel.ChangeCurrentView(_exerciseViewModel.Value);
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
     }
 }

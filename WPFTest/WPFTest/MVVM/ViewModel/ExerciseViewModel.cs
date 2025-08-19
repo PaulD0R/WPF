@@ -28,7 +28,7 @@ namespace WPFTest.MVVM.ViewModel
         private bool? _isLiked = false;
         private int? _likesCount = null;
         private string? _newCommentText = string.Empty;
-        private ObservableCollection<FullComment>? _comments = null;
+        private ObservableCollection<FullComment>? _comments = [];
         private bool? _isError = false;
         private string? _errorText = string.Empty;
 
@@ -198,7 +198,7 @@ namespace WPFTest.MVVM.ViewModel
                 IsLiked = await _personService.GetIsLickedAsync(Id);
                 LikesCount = await GetLikesCount();
                 NewCommentText = string.Empty;
-                Comments = new ObservableCollection<FullComment>(exercise.Comments);
+                Comments = new ObservableCollection<FullComment>(exercise.Comments ?? []);
                 IsError = false;
                 ErrorText = string.Empty;
             }
@@ -211,11 +211,21 @@ namespace WPFTest.MVVM.ViewModel
 
         public async Task<int?> GetLikesCount()
         {
-            var exerciseState = await _exerciseService.GetLikesCountByIdAsync(Id);
+            try
+            {
+                var exerciseState = await _exerciseService.GetLikesCountByIdAsync(Id);
 
-            if (exerciseState == null) return null;
+                if (exerciseState == null) return null;
 
-            return exerciseState.LikesCount;
+                return exerciseState.LikesCount;
+            }
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+
+                return 0;
+            }
         }
 
         public void OpenSubjectById(int id)
@@ -228,38 +238,52 @@ namespace WPFTest.MVVM.ViewModel
 
         public async Task GetExercisesTasksFileAsync()
         {
-            var files = await _exerciseService.GetFileByIdAsync(Id);
-            if (files == null) throw new Exception();
-
-            ZipFileStreamer.GetFile(files.TasksFile ?? []);
+            try
+            {
+                var files = await _exerciseService.GetFileByIdAsync(Id);
+                ZipFileStreamer.GetFile(files.TasksFile ?? []);
+            } 
+            catch (ApiExeption ex)
+            {
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
+            }
         }
 
         public async Task CreateCommentAsync()
         {
-            if (NewCommentText != string.Empty && NewCommentText != null)
+            try
             {
-                var newComment = new NewComment { Text = NewCommentText };
-
-                if (await _exerciseService.AddCommentAsync(Id, newComment))
+                if (NewCommentText != string.Empty && NewCommentText != null)
                 {
-                    NewCommentText = string.Empty;
+                    var newComment = new NewComment { Text = NewCommentText };
 
-                    var newComments = await _exerciseService.GetCommentsByIdAsync(Id);
+                    if (await _exerciseService.AddCommentAsync(Id, newComment))
+                    {
+                        NewCommentText = string.Empty;
 
-                    if (newComments != null) Comments = new ObservableCollection<FullComment>(newComments);
+                        var newComments = await _exerciseService.GetCommentsByIdAsync(Id);
+
+                        if (newComments != null) Comments = new ObservableCollection<FullComment>(newComments);
+                    }
+                    else
+                    {
+                        ErrorText = "Не удалось написать коментаарий";
+                        IsError = true;
+                        return;
+                    }
                 }
                 else
                 {
-                    ErrorText = "Не удалось написать коментаарий";
+                    ErrorText = "Заполните все поля";
                     IsError = true;
                     return;
                 }
             }
-            else
+            catch (ApiExeption ex)
             {
-                ErrorText = "Заполните все поля";
-                IsError = true;
-                return;
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
             }
         }
     }

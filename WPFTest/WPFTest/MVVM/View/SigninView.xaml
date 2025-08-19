@@ -83,6 +83,7 @@
                 Grid.ColumnSpan="2"
                 FontSize="25"
                 Height="50"
-                Command="{Binding SigninCommand}"/>
+                Command="{Binding SigninCommand}"
+                IsEnabled="{Binding IsntBlock}"/>
     </Grid>
 </UserControl>

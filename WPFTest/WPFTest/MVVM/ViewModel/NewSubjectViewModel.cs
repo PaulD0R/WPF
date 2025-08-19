@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Subject;
 using WPFTest.MVVM.ViewModel.Interfaces;
 
@@ -10,23 +11,23 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiSubjectService _apiSubjectService;
 
-        private string? _name;
-        private int? _year;
-        private string? _description;
-        private bool? _isError;
-        private string? _errorText;
+        private IMainViewModel _mainViewModel;
+        private Lazy<IErrorViewModel> _errorViewModel;
+
+        private string? _name = string.Empty;
+        private int? _year = 1;
+        private string? _description = string.Empty;
+        private bool? _isError = false;
+        private string? _errorText = string.Empty;
 
         public ICommand SaveCommand { get; set; }
 
-        public NewSubjectViewModel(ApiSubjectService apiSubjectService)
+        public NewSubjectViewModel(ApiSubjectService apiSubjectService, IMainViewModel mainViewModel, Lazy<IErrorViewModel> errorViewModel)
         {
             _apiSubjectService = apiSubjectService;
 
-            _name = string.Empty;
-            _year = 1;
-            _description = string.Empty;
-            _isError = false;
-            _errorText = string.Empty;
+            _mainViewModel = mainViewModel;
+            _errorViewModel = errorViewModel;
 
             SaveCommand = new AsyncRelayCommand(async _ => await CreateNewSubject());
         }
@@ -83,31 +84,39 @@ namespace WPFTest.MVVM.ViewModel
 
         public async Task CreateNewSubject()
         {
-            if (Name != string.Empty && Year != null && Description != string.Empty)
+            try
             {
-                var subject = new NewSubject
+                if (Name != string.Empty && Year != null && Description != string.Empty)
                 {
-                    Name = Name,
-                    Year = Year,
-                    Description = Description
-                };
+                    var subject = new NewSubject
+                    {
+                        Name = Name,
+                        Year = Year,
+                        Description = Description
+                    };
 
-                if(!await _apiSubjectService.AddSubjectAsync(subject))
-                {
-                    ErrorText = "Неудалось создать предмет";
-                    IsError = true;
-                    return;
+                    if (!await _apiSubjectService.AddSubjectAsync(subject))
+                    {
+                        ErrorText = "Неудалось создать предмет";
+                        IsError = true;
+                        return;
+                    }
+
+                    Name = string.Empty;
+                    Year = 1;
+                    Description = string.Empty;
+                    IsError = false;
                 }
-
-                Name = string.Empty;
-                Year = 1;
-                Description = string.Empty;
-                IsError = false;
+                else
+                {
+                    ErrorText = "Заполните все поля";
+                    IsError = true;
+                }
             }
-            else
+            catch (ApiExeption ex)
             {
-                ErrorText = "Заполните все поля";
-                IsError = true;
+                _errorViewModel.Value.LoadError(ex.Message);
+                _mainViewModel.ChangeCurrentView(_errorViewModel.Value);
             }
         }
     }

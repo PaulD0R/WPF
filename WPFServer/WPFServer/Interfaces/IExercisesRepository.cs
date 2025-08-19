@@ -14,7 +14,7 @@ namespace WPFServer.Interfaces
         int GetLength();
         Task AddAsync(Exercise exercise);
         Task<ExercisesFilesDto?> GetTasksFileByIdAsync(int id);
-        Task<bool?> ChangeIsLikedAsync(Person person, int id);
+        Task<bool?> ChangeIsLikedAsync(string personId, int id);
         Task<int?> GetLikesCountByIdAsync(int id);
     }
 }

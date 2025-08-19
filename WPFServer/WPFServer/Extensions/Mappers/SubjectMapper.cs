@@ -16,7 +16,7 @@ namespace WPFServer.Extensions.Mappers
             };
         }
 
-        public static SubjectDto ToSubjectDto(this Subject subject, string userName)
+        public static SubjectDto ToSubjectDto(this Subject subject, string userId)
         {
             return new SubjectDto()
             {
@@ -24,7 +24,7 @@ namespace WPFServer.Extensions.Mappers
                 Name = subject.Name,
                 Year = subject.Year,
                 Description = subject.Description,
-                Exercises = subject.Exercises?.Select(x => x.ToExerciseDto(userName)).ToList()
+                Exercises = subject.Exercises?.Select(x => x.ToExerciseDto(userId)).ToList()
             };
         }
 

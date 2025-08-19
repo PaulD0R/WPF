@@ -18,7 +18,7 @@ namespace WPFServer.Extensions.Mappers
             };
         }
 
-        public static ExerciseDto ToExerciseDto(this Exercise exercise, string userName)
+        public static ExerciseDto ToExerciseDto(this Exercise exercise, string userId)
         {
             return new ExerciseDto()
             {
@@ -27,7 +27,7 @@ namespace WPFServer.Extensions.Mappers
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
                 Subject = exercise.Subject?.Name,
-                IsLiked = exercise.Persons?.Any(p => p.UserName == userName) ?? false
+                IsLiked = exercise.Persons?.Any(p => p.Id == userId) ?? false
             };
         }
 

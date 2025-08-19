@@ -8,7 +8,7 @@ using WPFServer.Models;
 
 namespace WPFServer.Repositories
 {
-    public class ExercisesRepository(ApplicationContext context) : IExercisesRepository
+    public class ExercisesRepository(ApplicationContext context): IExercisesRepository
     {
         private readonly ApplicationContext _context = context;
 
@@ -63,6 +63,9 @@ namespace WPFServer.Repositories
             await _context.Exercises.AddAsync(exercise);
 
             var exercisesFiles = exercise.ExercisesFiles;
+
+            if (exercisesFiles == null) return;
+
             exercisesFiles.ExerciseId = exercise.Id;
 
             await _context.ExercisesFiles.AddAsync(exercisesFiles);
@@ -78,13 +81,15 @@ namespace WPFServer.Repositories
             return exercise.ExercisesFiles?.ToExercisesFilesDto();
         }
 
-        public async Task<bool?> ChangeIsLikedAsync(Person person, int id)
+        public async Task<bool?> ChangeIsLikedAsync(string personId, int id)
         {
             var exercise = await _context.Exercises.Include(x => x.Persons).FirstOrDefaultAsync(x => x.Id == id);
+            var person = await _context.Persons.FirstOrDefaultAsync(x => x.Id == personId);
 
+            if (person == null) return null;
             if (exercise == null) return null;
 
-            if (!exercise.Persons?.Remove(person) ?? false)
+            if (!exercise.Persons?.Remove(person) ?? true)
             {
                 exercise.Persons?.Add(person);
 
@@ -102,7 +107,7 @@ namespace WPFServer.Repositories
 
             if (exercise == null) return null;
 
-            return exercise.Persons?.Count() ?? 0;
+            return exercise.Persons?.Count ?? 0;
         }
     }
 }

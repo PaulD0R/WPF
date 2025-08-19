@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 using WPFTest.MVVM.ViewModel.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
@@ -8,9 +9,9 @@ namespace WPFTest.MVVM.ViewModel
     /// </summary>
     public partial class AuthenticationWindow : Window
     {
-        public AuthenticationWindow(IAuthenticationViewModel authenticationViewModel)
+        public AuthenticationWindow()
         {
-            DataContext = authenticationViewModel;
+            DataContext = App.ServiceProvider?.GetRequiredService<IAuthenticationViewModel>();
             InitializeComponent();
         }
     }

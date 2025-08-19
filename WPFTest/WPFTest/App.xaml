@@ -18,6 +18,8 @@
                 <ResourceDictionary Source="/Theme/ErrorTextBlock.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <converter:ViewModelConverter x:Key="ViewModelCoverter"/>
+
             <DataTemplate DataType="{x:Type viewModel:HomeViewModel}">
                 <view:HomeView/>
             </DataTemplate>

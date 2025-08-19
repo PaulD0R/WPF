@@ -17,10 +17,7 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 builder.Services.AddEndpointsApiExplorer();
-
-builder.WebHost.ConfigureKestrel(options => 
-    options.Limits.MaxRequestBodySize = StaticData.MAX_REQUEST_SIZE);
-
+builder.Services.AddMemoryCache();
 builder.Services.AddDbContext<ApplicationContext>(options =>
     options.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=WPF;Trusted_Connection=True;"));
 
@@ -62,6 +59,8 @@ builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>(
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IPersonsFilesRepository, PersonsFilesRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IJwtRepository, JwtRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
 builder.Services.AddCors(options =>
 {
@@ -109,6 +108,12 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
+builder.WebHost.ConfigureKestrel(options =>
+    options.Limits.MaxRequestBodySize = StaticData.MAX_REQUEST_SIZE);
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -120,6 +125,21 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = string.Empty;
     });
 }
+
+app.UseStatusCodePages(async statusCodeContext =>
+{
+    var response = statusCodeContext.HttpContext.Response;
+    response.ContentType = "text/plain, charset UTF-8";
+
+    await response.WriteAsync(response.StatusCode switch
+    {
+        404 => "Не найдено",
+        400 => "Неверный запрос",
+        401 => "Не авторизован",
+        403 => "Доступ запрещен",
+        _ => "Ошибка"
+    });
+});
 
 app.UseHttpsRedirection();
 app.UseRouting();

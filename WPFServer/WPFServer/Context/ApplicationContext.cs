@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 using WPFServer.Data;
 using WPFServer.Models;
 
@@ -14,6 +15,7 @@ namespace WPFServer.Context
         public DbSet<Person> Persons { get; set; }
         public DbSet<PersonsFiles> PersonsFiles { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
@@ -36,19 +38,7 @@ namespace WPFServer.Context
             const string USER_ID = "19EF95CD-413A-49EA-B4F1-448E9D86D81C";
 
             base.OnModelCreating(builder);
-
-            builder.Entity<Exercise>(entity =>
-            {
-                entity.HasKey(e => e.Id);
-
-                entity.HasOne(e => e.Subject)
-                    .WithMany(s => s.Exercises)
-                    .HasForeignKey(e => e.SubjectId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasMany(e => e.Persons)
-                    .WithMany(p => p.Exercises);
-            });
+            builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             List<IdentityRole> roles =
             [

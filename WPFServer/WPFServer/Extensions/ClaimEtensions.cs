@@ -15,5 +15,11 @@ namespace WPFServer.Extensions
             return principal.Claims.FirstOrDefault(x =>
                 x.Type.Equals(ClaimTypes.Email))?.Value;
         }
+
+        public static string? GetId(this ClaimsPrincipal principal)
+        {
+            return principal.Claims.FirstOrDefault(x =>
+                x.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
+        }
     }
 }

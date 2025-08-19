@@ -1,38 +1,37 @@
-﻿using System.Security;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
 using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
-using WPFTest.Services;
 using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
     public class SigninViewModel : ObserverItem, ISigninViewModel
     {
-        private readonly ApiAuthenticationService _personService;
-
-        private readonly INavigationService _navigationService;
+        private readonly ApiAuthenticationService _authenticationService;
         private readonly ICheckCorrectServise _checkCorrectServise;
 
         private string? _name = string.Empty;
         private string? _password = string.Empty;
         private bool? _isError = false;
         private string? _errorText = string.Empty;
+        private bool? _isntBlock = true;
+
+        private readonly Lazy<IAuthenticationViewModel> _authenticationViewModel;
 
         public ICommand NameCommand { get; set; }
         public ICommand PasswordCommand { get; set; }
         public ICommand SigninCommand { get; set; }
 
-        public SigninViewModel(ApiAuthenticationService personService, INavigationService navigationService, ICheckCorrectServise checkCorrectServise)
+        public SigninViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, Lazy<IAuthenticationViewModel> authenticationViewModel)
         {
-            _personService = personService;
-
-            _navigationService = navigationService;
+            _authenticationService = authenticationService;
             _checkCorrectServise = checkCorrectServise;
+
+            _authenticationViewModel = authenticationViewModel;
 
             NameCommand = new RelayCommand(x => Name = (string)x);
             PasswordCommand = new RelayCommand(x => Password = (string)x);
@@ -79,6 +78,16 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
+        public bool? IsntBlock
+        {
+            get => _isntBlock;
+            set
+            {
+                _isntBlock = value;
+                OnPropertyChanged();
+            }
+        }
+
         public async Task Signin()
         {
             try
@@ -97,12 +106,16 @@ namespace WPFTest.MVVM.ViewModel
                         Password = Password
                     };
 
-                    var person = await _personService.Signin(signinPerson);
+                    IsntBlock = false;
+                    var token = await _authenticationService.Signin(signinPerson);
+                    IsntBlock = true;
 
-                    if (person != null)
+                    if (token != null)
                     {
-                        StaticData.TOKEN = person.Token ?? string.Empty;
-                        _navigationService.ShowWindow<MainWindow>();
+                        Name = string.Empty;
+                        Password = string.Empty;
+
+                        _authenticationViewModel.Value.OpenMainApplication(token);
                     }
                 }
                 else
@@ -116,11 +129,13 @@ namespace WPFTest.MVVM.ViewModel
             {
                 ErrorText = ex.Message;
                 IsError = true;
+                IsntBlock = true;
             }
             catch
             {
                 ErrorText = "Ошибка";
                 IsError = true;
+                IsntBlock = true;
             }
         }
     }
