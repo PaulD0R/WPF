@@ -1,31 +1,72 @@
-﻿using System.Windows;
+﻿using Microsoft.Extensions.DependencyInjection;
 using WPFTest.Services.Interfaces;
 
 namespace WPFTest.Services
 {
-    class NavigationService : INavigationService
+    public class NavigationService : INavigationService
     {
-        public void ShowWindow<T>() where T : Window
+        private readonly IServiceProvider _serviceProvider;
+
+        private readonly Stack<NavigationState> _navigationStack;
+        private object? _currentView;
+
+        public NavigationService(IServiceProvider serviceProvider)
         {
-            var window = Activator.CreateInstance<T>();
-            window.Show();
+            _serviceProvider = serviceProvider;
+            _navigationStack = new Stack<NavigationState>();
         }
 
-        public void CloseAnotherWindow<T>() where T : Window
+        public event EventHandler<object>? NavigationChanged;
+
+        public object? CurrentView
         {
-            foreach (var window in Application.Current.Windows.OfType<Window>().Where(w => w.IsActive && !(w is T)))
+            get => _currentView;
+            private set
             {
-                window.Close();
+                _currentView = value;
+                NavigationChanged?.Invoke(null, null);
             }
         }
 
-        public void ShowAndClothesAnotherWindow<T>() where T : Window
+        public void NavigateTo<TViewModel>(Action<TViewModel>? initialization = null) where TViewModel : class
         {
-            var windows = Application.Current.Windows.OfType<Window>();
-            ShowWindow<T>();
-            foreach (var window in windows)
+            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
+            initialization?.Invoke(viewModel);
+
+            if (CurrentView != null)
             {
-                window.Close();
+                _navigationStack.Push(new NavigationState(CurrentView));
+            }
+
+            CurrentView = viewModel;
+        }
+
+        public bool CanNavigateBack()
+        {
+            return _navigationStack.Count > 0;
+        }
+
+        public void NavigateBack()
+        {
+            if (!CanNavigateBack())
+                return;
+
+            var previousState = _navigationStack.Pop();
+            CurrentView = previousState.ViewModel;
+        }
+
+        public void ClearHistory()
+        {
+            _navigationStack.Clear();
+        }
+
+        private class NavigationState
+        {
+            public object ViewModel { get; }
+
+            public NavigationState(object viewModel)
+            {
+                ViewModel = viewModel;
             }
         }
     }

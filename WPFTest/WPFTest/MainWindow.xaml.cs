@@ -21,20 +21,20 @@ namespace WPFTest
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void ChangeSizeButton_Click(object sender, RoutedEventArgs e)
         {
-            if (this.WindowState == WindowState.Normal)
+            if (WindowState == WindowState.Normal)
             {
                 MainBorder.CornerRadius = MAX_RADIUS;
-                this.WindowState = WindowState.Maximized;
+                WindowState = WindowState.Maximized;
             }
             else
             {
                 MainBorder.CornerRadius = MIN_RADIUS;
-                this.WindowState = WindowState.Normal;
+                WindowState = WindowState.Normal;
             }
         }
 

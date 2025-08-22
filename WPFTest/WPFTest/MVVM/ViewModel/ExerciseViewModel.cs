@@ -6,6 +6,7 @@ using WPFTest.Exeptions;
 using WPFTest.FileStreamers;
 using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
@@ -13,8 +14,7 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiExerciseService _exerciseService;
         private readonly ApiPersonService _personService;
-
-        private readonly IMainViewModel _mainViewModel;
+        private readonly INavigationService _navigationService;
 
         private int _id = 0;
         private int _subjectId = 0;
@@ -22,7 +22,6 @@ namespace WPFTest.MVVM.ViewModel
         private int? _year = null;
         private int? _number = null;
         private string? _task = null;
-        private bool _isLoaded = false;
         private bool? _isLiked = false;
         private int? _likesCount = null;
         private string? _newCommentText = string.Empty;
@@ -30,25 +29,21 @@ namespace WPFTest.MVVM.ViewModel
         private bool? _isError = false;
         private string? _errorText = string.Empty;
 
-        public ICommand SubjectViewCommand { get; set; }
-        public ICommand LoadTasksFileCommand { get; set; }
-        public ICommand ChangeIsLikedCommand { get; set; }
-        public ICommand CreateCommentCommand { get; set; }
+        public ICommand SubjectViewCommand { get; }
+        public ICommand LoadTasksFileCommand { get; }
+        public ICommand ChangeIsLikedCommand { get; }
+        public ICommand CreateCommentCommand { get; }
 
-        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, IMainViewModel mainViewModel)
+        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, 
+            INavigationService navigationService)
         {
             _exerciseService = apiExerciseService;
             _personService = personService;
-
-            _mainViewModel = mainViewModel;
+            _navigationService = navigationService;
 
             SubjectViewCommand = new RelayCommand(_ => OpenSubjectById(SubjectId));
             LoadTasksFileCommand = new AsyncRelayCommand(async _ => await GetExercisesTasksFileAsync());
-            ChangeIsLikedCommand = new AsyncRelayCommand(async x =>
-            {
-                await _exerciseService.ChangeIsLikedAsync((int)x);
-                LikesCount = await GetLikesCount();
-            });
+            ChangeIsLikedCommand = new AsyncRelayCommand(async _ => await ChangeIsLiked());
             CreateCommentCommand = new AsyncRelayCommand(async _ => await CreateCommentAsync());
         }
 
@@ -100,16 +95,6 @@ namespace WPFTest.MVVM.ViewModel
             set
             {
                 _task = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public bool IsLoaded
-        {
-            get => _isLoaded;
-            set
-            {
-                _isLoaded = value;
                 OnPropertyChanged();
             }
         }
@@ -178,11 +163,7 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                IsLoaded = false;
-                Id = id;
-                var exercise = await _exerciseService.GetByIdAsync(Id);
-
-                if (exercise == null) throw new Exception();
+                var exercise = await _exerciseService.GetByIdAsync(id) ?? throw new Exception();
 
                 Id = exercise.Id;
                 SubjectId = exercise.SubjectId;
@@ -190,7 +171,6 @@ namespace WPFTest.MVVM.ViewModel
                 Year = exercise.Subject?.Year;
                 Number = exercise.Number;
                 Task = exercise.Task;
-                IsLoaded = true;
                 IsLiked = await _personService.GetIsLickedAsync(Id);
                 LikesCount = await GetLikesCount();
                 NewCommentText = string.Empty;
@@ -200,11 +180,11 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public async Task<int?> GetLikesCount()
+        private async Task<int?> GetLikesCount()
         {
             try
             {
@@ -216,18 +196,18 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message)); ;
 
                 return 0;
             }
         }
 
-        public void OpenSubjectById(int id)
+        private void OpenSubjectById(int id)
         {
-            _mainViewModel.OpenSubject(id);
+            _navigationService.NavigateTo<ISubjectViewModel>(x => x.LoadSubject(id));
         }
 
-        public async Task GetExercisesTasksFileAsync()
+        private async Task GetExercisesTasksFileAsync()
         {
             try
             {
@@ -236,14 +216,23 @@ namespace WPFTest.MVVM.ViewModel
             } 
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public async Task CreateCommentAsync()
+        private async Task ChangeIsLiked()
+        {
+            await _exerciseService.ChangeIsLikedAsync(Id);
+            LikesCount = await GetLikesCount();
+        }
+
+        private async Task CreateCommentAsync()
         {
             try
             {
+                ErrorText = string.Empty;
+                IsError = false;
+
                 if (NewCommentText != string.Empty && NewCommentText != null)
                 {
                     var newComment = new NewComment { Text = NewCommentText };
@@ -272,7 +261,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
     }

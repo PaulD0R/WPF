@@ -109,7 +109,7 @@
                     <RadioButton Content="{Binding Number}"
                                  GroupName="Pages"
                                  Style="{StaticResource PageButtonTheme}"
-                                 Command="{Binding DataContext.ChangePage, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                 Command="{Binding DataContext.ChangePageCommand , RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                  CommandParameter="{Binding Number}"
                                  IsChecked="{Binding IsChecked}"/>
                 </DataTemplate>

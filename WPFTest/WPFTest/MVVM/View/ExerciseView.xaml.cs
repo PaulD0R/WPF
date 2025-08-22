@@ -11,7 +11,6 @@ namespace WPFTest.MVVM.View
     {
         public ExerciseView()
         {
-            DataContext = App.ServiceProvider?.GetRequiredService<IExerciseViewModel>();
             InitializeComponent();
         }
     }

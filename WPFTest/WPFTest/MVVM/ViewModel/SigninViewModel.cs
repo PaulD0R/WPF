@@ -1,9 +1,11 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services;
 using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
@@ -12,6 +14,8 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiAuthenticationService _authenticationService;
         private readonly ICheckCorrectServise _checkCorrectServise;
+        private readonly IWindowNavigationService _windowNavigationService;
+        private readonly INavigationService _navigationService;
 
         private string? _name = string.Empty;
         private string? _password = string.Empty;
@@ -19,20 +23,17 @@ namespace WPFTest.MVVM.ViewModel
         private string? _errorText = string.Empty;
         private bool? _isntBlock = true;
 
-        private readonly IAuthenticationViewModel _authenticationViewModel;
+        public ICommand PasswordCommand { get; }
+        public ICommand SigninCommand { get; }
 
-        public ICommand NameCommand { get; set; }
-        public ICommand PasswordCommand { get; set; }
-        public ICommand SigninCommand { get; set; }
-
-        public SigninViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, IAuthenticationViewModel authenticationViewModel)
+        public SigninViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, 
+            IWindowNavigationService windowNavigationService, INavigationService navigationService)
         {
             _authenticationService = authenticationService;
             _checkCorrectServise = checkCorrectServise;
+            _windowNavigationService = windowNavigationService;
+            _navigationService = navigationService;
 
-            _authenticationViewModel = authenticationViewModel;
-
-            NameCommand = new RelayCommand(x => Name = (string)x);
             PasswordCommand = new RelayCommand(x => Password = (string)x);
             SigninCommand = new AsyncRelayCommand(async _ => await Signin());
         }
@@ -87,10 +88,13 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async Task Signin()
+        private async Task Signin()
         {
             try
             {
+                ErrorText = string.Empty;
+                IsError = false;
+
                 if (!_checkCorrectServise.IsPassword(Password ?? string.Empty))
                 {
                     ErrorText = "Некорректный пароль";
@@ -114,7 +118,11 @@ namespace WPFTest.MVVM.ViewModel
                         Name = string.Empty;
                         Password = string.Empty;
 
-                        _authenticationViewModel.OpenMainApplication(token);
+                        StaticData.TOKEN = token.Jwt ?? string.Empty;
+                        TokenStorageService.SaveRefreshToken(token.RefreshToken ?? string.Empty);
+
+                        _navigationService.ClearHistory();
+                        _windowNavigationService.ShowAndHideAnotherWindow<MainWindow>();
                     }
                 }
                 else

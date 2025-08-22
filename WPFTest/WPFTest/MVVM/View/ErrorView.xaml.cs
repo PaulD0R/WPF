@@ -11,7 +11,6 @@ namespace WPFTest.MVVM.View
     {
         public ErrorView()
         {
-            DataContext = App.ServiceProvider?.GetRequiredService<IErrorViewModel>();
             InitializeComponent();
         }
     }

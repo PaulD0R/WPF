@@ -2,89 +2,57 @@
 using WPFTest.ApiServices;
 using WPFTest.Core;
 using WPFTest.Data;
-using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.Services;
 using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
-    public class AuthenticationViewModel : ObserverItem, IAuthenticationViewModel
+    public class AuthenticationViewModel : ObserverItem, IAuthenticationViewModel, IDisposable
     {
         private readonly ApiAuthenticationService _authenticationServixe;
+        private readonly IWindowNavigationService _windowNvigationService;
+        private readonly IModelNavigationService _modelNavigationService;
 
-        private readonly INavigationService _navigationService;
+        public ICommand SigninCommand { get; }
+        public ICommand SignupCommand { get; }
 
-        private object? _curentView = null;
-        private bool _isntBlock = true;
-
-        private readonly Lazy<ISigninViewModel> _signinViewModel;
-        private readonly Lazy<ISignupViewModel> _signupViewModel;
-
-        public ICommand SigninCommand { get; set; }
-        public ICommand SignupCommand { get; set; }
-
-
-        public AuthenticationViewModel(Lazy<ISigninViewModel> signinVewModel, Lazy<ISignupViewModel> signupViewModel, ApiAuthenticationService authenticationService, INavigationService navigationService)
+        public AuthenticationViewModel(ApiAuthenticationService authenticationService, 
+            IWindowNavigationService windowNavigationService, IModelNavigationService modelNavigationService)
         {
-            _signinViewModel = signinVewModel;
-            _signupViewModel = signupViewModel;
-
-            _navigationService = navigationService;
-
+            _windowNvigationService = windowNavigationService;
+            _modelNavigationService = modelNavigationService;
             _authenticationServixe = authenticationService;
 
-            SigninCommand = new RelayCommand(_ => ChangeCurrentView(_signinViewModel.Value));
-            SignupCommand = new RelayCommand(_ => ChangeCurrentView(_signupViewModel.Value));
+            CurrentView = _modelNavigationService.CurrentView;
 
-            _navigationService.CloseAnotherWindow<AuthenticationWindow>();
+            SigninCommand = new RelayCommand(_ => OpenSignin());
+            SignupCommand = new RelayCommand(_ => OpenSignup());
+
+            _modelNavigationService.NavigationChanged += ChangeCurrentView;
 
             CheckToken();
         }
 
-        public object? CurentView
+        public object? CurrentView {get; set;}
+
+        private void OpenSignin()
         {
-            get => _curentView;
-            set
-            {
-                _curentView = value;
-                OnPropertyChanged();
-            }
+            _modelNavigationService.NavigateTo<ISigninViewModel>();
         }
 
-        public bool IsntBlock
+        private void OpenSignup()
         {
-            get => _isntBlock;
-            set
-            {
-                _isntBlock = value;
-                OnPropertyChanged();
-            }
+            _modelNavigationService.NavigateTo<ISignupViewModel>();
         }
 
-        public void OpenMainApplication(Token tokens)
+        private void ChangeCurrentView(object sender, object value)
         {
-            try
-            {
-                if (tokens == null) return;
-
-                StaticData.TOKEN = tokens.Jwt ?? string.Empty;
-                TokenStorageService.SaveRefreshToken(tokens.RefreshToken ?? string.Empty);
-
-                _navigationService.ShowAndClothesAnotherWindow<MainWindow>();
-            }
-            catch
-            {
-                return;
-            }
+            CurrentView = _modelNavigationService.CurrentView;
+            OnPropertyChanged(nameof(CurrentView));
         }
 
-        public void ChangeCurrentView(object curentView)
-        {
-            CurentView = curentView;
-        }
-
-        public async void CheckToken()
+        private async void CheckToken()
         {
             try
             {
@@ -99,11 +67,17 @@ namespace WPFTest.MVVM.ViewModel
                 StaticData.TOKEN = tokens.Jwt ?? string.Empty;
                 TokenStorageService.SaveRefreshToken(tokens.RefreshToken ?? string.Empty);
 
-                _navigationService.ShowAndClothesAnotherWindow<MainWindow>();
-            } catch
+                _windowNvigationService.ShowAndHideAnotherWindow<MainWindow>();
+            } 
+            catch
             {
                 return;
             }
+        }
+
+        public void Dispose()
+        {
+            _modelNavigationService.NavigationChanged -= ChangeCurrentView;
         }
     }
 }

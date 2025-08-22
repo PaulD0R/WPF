@@ -1,7 +1,15 @@
-﻿namespace WPFTest.MVVM.ViewModel.Interfaces
+﻿using System.Windows.Input;
+
+namespace WPFTest.MVVM.ViewModel.Interfaces
 {
     public interface INewSubjectViewModel
     {
-        Task CreateNewSubject();
+        string? Name { get; set; }
+        int? Year { get; set; }
+        string? Description { get; set; }
+        bool? IsError { get; set; }
+        string? ErrorText { get; set; }
+
+        ICommand SaveCommand { get; }
     }
 }

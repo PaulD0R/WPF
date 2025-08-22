@@ -18,10 +18,8 @@ namespace WPFTest.MVVM.ViewModel
         private readonly ApiPersonService _personService;
         private readonly ApiExerciseService _exerciseService;
         private readonly ApiAuthenticationService _authenticationService;
-
-        private readonly IMainViewModel _mainViewModel;
-
         private readonly INavigationService _navigationService;
+        private readonly IWindowNavigationService _windowNavigationService;
 
         private string? _id = string.Empty;
         private string? _name = string.Empty;
@@ -29,21 +27,21 @@ namespace WPFTest.MVVM.ViewModel
         private byte[]? _image = [];
         private ObservableCollection<LightExercise>? _exercises = [];
 
-        public ICommand ChangeImageCommand { get; set; }
-        public ICommand DeleteImageCommand { get; set; }
-        public ICommand ChangeIsLikedCommand { get; set; }
-        public ICommand ExerciseViewCommand { get; set; }
-        public ICommand LogoutCommand { get; set; }
+        public ICommand ChangeImageCommand { get; }
+        public ICommand DeleteImageCommand { get; }
+        public ICommand ChangeIsLikedCommand { get; }
+        public ICommand ExerciseViewCommand { get; }
+        public ICommand LogoutCommand { get; }
 
-        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, ApiAuthenticationService authenticationService, INavigationService navigationService, IMainViewModel mainViewModel)
+        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, 
+            ApiAuthenticationService authenticationService, IWindowNavigationService windowNavigationService, 
+            INavigationService navigationService)
         {
             _personService = personService;
             _exerciseService = exerciseService;
             _authenticationService = authenticationService;
-
+            _windowNavigationService = windowNavigationService;
             _navigationService = navigationService;
-
-            _mainViewModel = mainViewModel;
 
             ChangeImageCommand = new AsyncRelayCommand(async _ => await ChangeImage());
             DeleteImageCommand = new AsyncRelayCommand(async _ => await DeleteImage());
@@ -104,7 +102,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async Task ChangeImage()
+        private async Task ChangeImage()
         {
             try
             {
@@ -118,11 +116,11 @@ namespace WPFTest.MVVM.ViewModel
             } 
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public async Task DeleteImage()
+        private async Task DeleteImage()
         {
             try
             {
@@ -131,11 +129,35 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public async void LoadPerson()
+        private void OpenExerciseById(int id)
+        {
+            _navigationService.NavigateTo<IExerciseViewModel>(x => x.LoadExercise(id));
+        }
+
+        private async Task Logout()
+        {
+            try
+            {
+                if (await _authenticationService.Logout())
+                {
+                    TokenStorageService.ClearRefreshToken();
+                    StaticData.TOKEN = string.Empty;
+
+                    _navigationService.ClearHistory();
+                    _windowNavigationService.ShowAndHideAnotherWindow<AuthenticationWindow>();
+                }
+            }
+            catch (ApiExeption ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
+        }
+
+        private async void LoadPerson()
         {
             try
             {
@@ -154,37 +176,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
-            }
-        }
-
-        public void OpenExerciseById(int id)
-        {
-            try
-            {
-                 _mainViewModel.OpenExerciseView(id);
-            }
-            catch (ApiExeption ex)
-            {
-                _mainViewModel.OpenErrorView(ex.Message);
-            }
-        }
-
-        public async Task Logout()
-        {
-            try
-            {
-                if (await _authenticationService.Logout())
-                {
-                    TokenStorageService.ClearRefreshToken();
-                    StaticData.TOKEN = string.Empty;
-
-                    _navigationService.ShowAndClothesAnotherWindow<AuthenticationWindow>();
-                }
-            }
-            catch (ApiExeption ex)
-            {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
     }

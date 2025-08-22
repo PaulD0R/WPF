@@ -12,7 +12,6 @@ namespace WPFTest.MVVM.View
         public PersonView()
         {
             InitializeComponent();
-            DataContext = App.ServiceProvider?.GetRequiredService<IPersonViewModel>();
         }
     }
 }

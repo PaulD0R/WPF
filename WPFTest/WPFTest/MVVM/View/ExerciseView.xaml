@@ -119,8 +119,7 @@
                                 <CheckBox IsChecked="{Binding IsLiked}"
                                          Style="{StaticResource LikeButtonTheme}"
                                          Command="{Binding ChangeIsLikedCommand}"
-                                         CommandParameter="{Binding Id}"
-                                          Margin="10, 0, 0, 0"/>
+                                         Margin="10, 0, 0, 0"/>
                                 
                                 <TextBlock Text="{Binding LikesCount}"
                                            FontSize="25"

@@ -31,7 +31,7 @@ namespace WPFServer.Repositories
                     issuer: StaticData.ISSURE,
                     audience: StaticData.AUDIENCE,
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(1),
+                    expires: DateTime.Now.AddMinutes(10),
                     signingCredentials: new SigningCredentials
                         (new SymmetricSecurityKey(Encoding.UTF8.GetBytes(StaticData.KEY)), SecurityAlgorithms.HmacSha256)
             );

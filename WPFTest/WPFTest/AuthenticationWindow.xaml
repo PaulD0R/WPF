@@ -44,7 +44,7 @@
 
             <ContentControl VerticalAlignment="Stretch"
                             HorizontalAlignment="Stretch"
-                            Content="{Binding CurentView}"/>
+                            Content="{Binding CurrentView}"/>
         </StackPanel>
     </Border>
 </Window>

@@ -7,6 +7,7 @@ using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.Model.Files;
 using WPFTest.MVVM.Model.Subject;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
@@ -14,8 +15,7 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiExerciseService _exerciseService;
         private readonly ApiSubjectService _subjectService;
-
-        private readonly IMainViewModel _mainViewModel;
+        private readonly INavigationService _navigationService;
 
         private int? _subjectId = 1;
         private int? _number = 1;
@@ -25,17 +25,17 @@ namespace WPFTest.MVVM.ViewModel
         private bool? _isError = false;
         private string? _errorText = string.Empty;
 
-        public ICommand FileCommand { get; set; }
-        public ICommand SaveCommand { get; set; }
-        public ICommand NewSubjectViewCommand { get; set; }
+        public ICommand FileCommand { get; }
+        public ICommand SaveCommand { get; }
+        public ICommand NewSubjectViewCommand { get; }
 
 
-        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, IMainViewModel mainViewModel)
+        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, 
+            INavigationService navigationService)
         {
             _exerciseService = exerciseiService;
             _subjectService = subjectService;
-
-            _mainViewModel = mainViewModel;
+            _navigationService = navigationService;
 
             FileCommand = new RelayCommand(_ => File = ZipFileStreamer.SetFile());
             NewSubjectViewCommand = new RelayCommand(_ => OpenNewSubject());
@@ -113,7 +113,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async void LoadSubjects()
+        private async void LoadSubjects()
         {
             try
             {
@@ -121,11 +121,11 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public async Task CreateNewExerciseAsync()
+        private async Task CreateNewExerciseAsync()
         {
             try
             {
@@ -163,19 +163,19 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public void OpenNewSubject()
+        private void OpenNewSubject()
         {
             try
             {
-                _mainViewModel.OpenNewSubjectView();
+                _navigationService.NavigateTo<IErrorViewModel>();
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
     }

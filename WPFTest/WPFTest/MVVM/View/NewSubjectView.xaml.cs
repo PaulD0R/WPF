@@ -11,7 +11,6 @@ namespace WPFTest.MVVM.View
     {
         public NewSubjectView()
         {
-            DataContext = App.ServiceProvider?.GetRequiredService<INewSubjectViewModel>();
             InitializeComponent();
         }
     }

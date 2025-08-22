@@ -6,38 +6,36 @@ using WPFTest.ApiServices;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.Exeptions;
+using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
     public class DiscoverViewModel : ObserverItem, IDiscoverViewModel
     {
         private readonly ApiExerciseService _exerciseService;
-
-        private readonly IMainViewModel _mainViewModel;
+        private readonly INavigationService _navigationService;
 
         private ObservableCollection<LightExercise> _exercises = [];
         private List<PageButtonData> _pages = [];
-        private int _pageNumer = 1;
+        private int _pageNumber = 1;
 
-        public ICommand ChangePage { get; set; }
-        public ICommand ExerciseViewCommand { get; set; }
-        public ICommand ChangeIsLikedCommand { get; set; }
+        public ICommand ChangePageCommand { get; }
+        public ICommand ExerciseViewCommand { get; }
+        public ICommand ChangeIsLikedCommand { get; }
 
-        public DiscoverViewModel(ApiExerciseService exerciseService, IMainViewModel mainViewModel)
+        public DiscoverViewModel(ApiExerciseService exerciseService, INavigationService navigationService)
         {
             _exerciseService = exerciseService;
-            _mainViewModel = mainViewModel;
+            _navigationService = navigationService;
 
-            ChangePage = new RelayCommand(x => {
-                PageNumber = (int)x;
-                LoadExercises();
-            });
+            ChangePageCommand = new RelayCommand(x => ChangePage((int)x));
             ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int) x));
             ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
 
             LoadExercises();
             LoadPages();
         }
+
 
         public ObservableCollection<LightExercise> Exercises
         {
@@ -61,10 +59,10 @@ namespace WPFTest.MVVM.ViewModel
 
         public int PageNumber
         {
-            get => _pageNumer;
+            get => _pageNumber;
             set
             {
-                _pageNumer = value;
+                _pageNumber = value;
                 OnPropertyChanged();
             }
         }
@@ -73,12 +71,12 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                var exercises = await _exerciseService.GetByPageAsync(_pageNumer);
+                var exercises = await _exerciseService.GetByPageAsync(_pageNumber);
                 Exercises = new ObservableCollection<LightExercise>(exercises);
             } 
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
@@ -104,20 +102,18 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
-
-        public void OpenExerciseById(int id)
+        private void ChangePage(int number)
         {
-            try
-            {
-                _mainViewModel.OpenExerciseView(id);
-            } 
-            catch (ApiExeption ex)
-            {
-                _mainViewModel.OpenErrorView(ex.Message);
-            }
+            PageNumber = number;
+            LoadExercises();
+        }
+
+        private void OpenExerciseById(int id)
+        {
+            _navigationService.NavigateTo<IExerciseViewModel>(x => x.LoadExercise(id));
         }
     }
 }

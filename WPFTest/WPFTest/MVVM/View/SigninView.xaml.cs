@@ -11,7 +11,6 @@ namespace WPFTest.MVVM.View
     {
         public SignupView()
         {
-            DataContext = App.ServiceProvider?.GetRequiredService<ISigninViewModel>();
             InitializeComponent();
         }
     }

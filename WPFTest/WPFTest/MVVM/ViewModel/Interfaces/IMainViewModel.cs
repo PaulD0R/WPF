@@ -1,15 +1,18 @@
-﻿namespace WPFTest.MVVM.ViewModel.Interfaces
+﻿using System.Windows.Input;
+
+namespace WPFTest.MVVM.ViewModel.Interfaces
 {
     public interface IMainViewModel
     {
-        void OpenPersonView();
-        void OpenExerciseView(int id);
-        void OpenNewExercise();
-        void OpenNewSubjectView();
-        void OpenHomeView();
-        void OpenDictonaryView();
-        void OpenErrorView(string error);
-        void OpenSubject(int id);
-        void LoadRoles();
+        bool? IsDiscover {  get; set; }
+        bool? IsHome {  get; set; }
+        bool? IsAddVisible { get; set; }
+        string? FindName {  get; set; }
+
+        ICommand HomeCommand { get; }
+        ICommand DiscoverCommand { get; }
+        ICommand NewExercisesCommand { get; }
+        ICommand FindPersonCommand { get; }
+        ICommand BackCommand { get; }
     }
 }

@@ -4,6 +4,7 @@ using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
@@ -11,8 +12,7 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiExerciseService _exerciseService;
         private readonly ApiSubjectService _subjectService;
-
-        private readonly IMainViewModel _mainViewModel;
+        private readonly INavigationService _navigationService;
 
 
         private string? _name = string.Empty;
@@ -20,15 +20,15 @@ namespace WPFTest.MVVM.ViewModel
         private string? _description = string.Empty;
         private ICollection<LightExercise>? _exercises;
 
-        public ICommand ExerciseViewCommand { get; set; }
-        public ICommand ChangeIsLikedCommand { get; set; }
+        public ICommand ExerciseViewCommand { get; }
+        public ICommand ChangeIsLikedCommand { get; }
 
-        public SubjectViewModel(ApiSubjectService subjectService, IMainViewModel mainViewModel, ApiExerciseService exerciseService)
+        public SubjectViewModel(ApiSubjectService subjectService, ApiExerciseService exerciseService,
+            INavigationService navigationService)
         {
-            _mainViewModel = mainViewModel;
-
             _subjectService = subjectService;
             _exerciseService = exerciseService;
+            _navigationService = navigationService;
 
             ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int)x));
             ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
@@ -87,19 +87,19 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        public void OpenExerciseById(int id)
+        private void OpenExerciseById(int id)
         {
             try
             {
-                _mainViewModel.OpenExerciseView(id);
+                _navigationService.NavigateTo<IExerciseViewModel>(x => x.LoadExercise(id));
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
     }

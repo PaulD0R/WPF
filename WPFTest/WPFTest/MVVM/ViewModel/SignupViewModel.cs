@@ -1,9 +1,11 @@
 ﻿using System.Windows.Input;
 using WPFTest.ApiServices;
 using WPFTest.Core;
+using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services;
 using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
@@ -12,6 +14,8 @@ namespace WPFTest.MVVM.ViewModel
     {
         private readonly ApiAuthenticationService _authenticationService;
         private readonly ICheckCorrectServise _checkCorrectServise;
+        private readonly IWindowNavigationService _windowNavigationService;
+        private readonly INavigationService _navigationService;
 
         private string? _name = string.Empty;
         private string? _email = string.Empty;
@@ -20,17 +24,16 @@ namespace WPFTest.MVVM.ViewModel
         private string? _errorText = string.Empty;
         private bool? _isntBlock = true;
 
-        private readonly IAuthenticationViewModel _authenticationViewModel;
+        public ICommand PasswordCommand { get; }
+        public ICommand SignupCommand { get; }
 
-        public ICommand PasswordCommand { get; set; }
-        public ICommand SignupCommand { get; set; }
-
-        public SignupViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, IAuthenticationViewModel authenticationViewModel)
+        public SignupViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, 
+            IWindowNavigationService windowNavigationService, INavigationService navigationService)
         {
             _checkCorrectServise = checkCorrectServise;
-            _authenticationViewModel = authenticationViewModel;
-
+            _windowNavigationService = windowNavigationService;
             _authenticationService = authenticationService;
+            _navigationService = navigationService;
 
             PasswordCommand = new RelayCommand(x => Password = (string)x);
             SignupCommand = new AsyncRelayCommand(async _ => await Signup());
@@ -96,10 +99,13 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async Task Signup()
+        private async Task Signup()
         {
             try
             {
+                ErrorText = string.Empty;
+                IsError = false;
+
                 if (!_checkCorrectServise.IsEmail(Email ?? string.Empty))
                 {
                     ErrorText = "Некорректная почта";
@@ -131,7 +137,11 @@ namespace WPFTest.MVVM.ViewModel
                         Email = string.Empty;
                         Password = string.Empty;
 
-                        _authenticationViewModel.OpenMainApplication(token);
+                        StaticData.TOKEN = token.Jwt ?? string.Empty;
+                        TokenStorageService.SaveRefreshToken(token.RefreshToken ?? string.Empty);
+
+                        _navigationService.ClearHistory();
+                        _windowNavigationService.ShowAndHideAnotherWindow<MainWindow>();
                     }
                     else
                     {

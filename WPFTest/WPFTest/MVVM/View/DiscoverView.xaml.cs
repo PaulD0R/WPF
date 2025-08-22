@@ -14,7 +14,6 @@ namespace WPFTest.MVVM.View
     {
         public DiscoverView()
         {
-            DataContext = App.ServiceProvider?.GetRequiredService<IDiscoverViewModel>();
             InitializeComponent();
         }
 

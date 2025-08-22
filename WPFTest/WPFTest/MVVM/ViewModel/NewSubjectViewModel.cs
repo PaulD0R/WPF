@@ -4,14 +4,14 @@ using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Subject;
 using WPFTest.MVVM.ViewModel.Interfaces;
+using WPFTest.Services.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
     public class NewSubjectViewModel : ObserverItem, INewSubjectViewModel
     {
         private readonly ApiSubjectService _apiSubjectService;
-
-        private IMainViewModel _mainViewModel;
+        private readonly INavigationService _navigationService;
 
         private string? _name = string.Empty;
         private int? _year = 1;
@@ -19,13 +19,12 @@ namespace WPFTest.MVVM.ViewModel
         private bool? _isError = false;
         private string? _errorText = string.Empty;
 
-        public ICommand SaveCommand { get; set; }
+        public ICommand SaveCommand { get; }
 
-        public NewSubjectViewModel(ApiSubjectService apiSubjectService, IMainViewModel mainViewModel)
+        public NewSubjectViewModel(ApiSubjectService apiSubjectService, INavigationService navigationService)
         {
             _apiSubjectService = apiSubjectService;
-
-            _mainViewModel = mainViewModel;
+            _navigationService = navigationService;
 
             SaveCommand = new AsyncRelayCommand(async _ => await CreateNewSubject());
         }
@@ -80,7 +79,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async Task CreateNewSubject()
+        private async Task CreateNewSubject()
         {
             try
             {
@@ -113,7 +112,7 @@ namespace WPFTest.MVVM.ViewModel
             }
             catch (ApiExeption ex)
             {
-                _mainViewModel.OpenErrorView(ex.Message);
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
     }

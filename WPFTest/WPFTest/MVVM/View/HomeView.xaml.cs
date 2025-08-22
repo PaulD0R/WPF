@@ -11,7 +11,6 @@ namespace WPFTest.MVVM.View
     {
         public HomeView()
         {
-            DataContext = App.ServiceProvider?.GetRequiredService<IHomeViewModel>();
             InitializeComponent();
         }
     }
