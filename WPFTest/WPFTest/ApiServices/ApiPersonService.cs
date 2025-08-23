@@ -60,7 +60,7 @@ namespace WPFTest.ApiServices
                 return response;
 
             if (!await TryRefreshTokenAsync())
-                throw new ApiExeption(response.StatusCode);
+                throw new ApiException(response.StatusCode);
 
             return await requestFunc();
         }
@@ -74,8 +74,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<FullPerson?> GetPersonByIdAsync(string id)
@@ -87,8 +87,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<FullPerson?> GetPersonByNameAsync(string name)
@@ -100,8 +100,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<bool?> GetIsLickedAsync(int exerciseId)
@@ -113,8 +113,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<ImageNewFile?> ChangePrivateImageAsync(ImageNewFile newImage)
@@ -126,8 +126,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<bool> DeletePrivateImageAsync()
@@ -139,8 +139,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<bool> DeleteCommentAsync(int id)
@@ -152,8 +152,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public void Dispose()

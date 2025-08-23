@@ -41,6 +41,24 @@ namespace WPFTest.Services
             CurrentView = viewModel;
         }
 
+        public async Task NavigateToAsync<TViewModel>(
+            Func<TViewModel, Task>? initialization = null) where TViewModel : class
+        {
+            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
+
+            if (initialization != null)
+            {
+                await initialization(viewModel);
+            }
+
+            if (CurrentView != null)
+            {
+                _navigationStack.Push(new NavigationState(CurrentView));
+            }
+
+            CurrentView = viewModel;
+        }
+
         public bool CanNavigateBack()
         {
             return _navigationStack.Count > 0;

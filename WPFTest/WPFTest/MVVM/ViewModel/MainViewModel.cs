@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using WPFTest.Core;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.Services.Interfaces;
 
@@ -27,10 +28,10 @@ namespace WPFTest.MVVM.ViewModel
             _jwtService = jwtService;
             _navigationService = navigationService;
 
-            HomeCommand = new RelayCommand(_ => OpenHome());
-            DiscoverCommand = new RelayCommand(_ => OpenDiscover());
-            NewExercisesCommand = new RelayCommand(_ => OpenNewExercise());
-            FindPersonCommand = new RelayCommand(_ => OpenPerson());
+            HomeCommand = new AsyncRelayCommand(async _ => await OpenHome());
+            DiscoverCommand = new AsyncRelayCommand(async _ => await OpenDiscover());
+            NewExercisesCommand = new AsyncRelayCommand(async _ => await OpenNewExercise());
+            FindPersonCommand = new AsyncRelayCommand(async _ => await OpenPerson());
             BackCommand = new RelayCommand(_ => Back());
 
             _navigationService.ClearHistory();
@@ -81,29 +82,60 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        private void OpenHome()
+        private async Task OpenHome()
         {
-            _navigationService.NavigateTo<IHomeViewModel>();
-        }
-
-        private void OpenDiscover()
-        {
-            _navigationService.NavigateTo<IDiscoverViewModel>(x =>
+            try
             {
-                x.LoadExercises();
-                x.LoadPages();
-            });
+                await _navigationService.NavigateToAsync<IHomeViewModel>(async x => await x.LoadPerson());
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
         }
 
-        private void OpenNewExercise()
+        private async Task OpenDiscover()
         {
-            _navigationService.NavigateTo<INewExerciseViewModel>();
+            try
+            {
+                await _navigationService.NavigateToAsync<IDiscoverViewModel>(async x =>
+                {
+                    await x.LoadExercises();
+                    await x.LoadPages();
+                });
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
         }
 
-        private void OpenPerson()
+        private async Task OpenNewExercise()
         {
-            _navigationService.NavigateTo<IPersonViewModel>(x => x.LoadPerson(FindName ?? string.Empty));
-            FindName = string.Empty;
+            try
+            {
+                await _navigationService.NavigateToAsync<INewExerciseViewModel>(async x => await x.LoadSubjects());
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
+        }
+
+        private async Task OpenPerson()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(FindName))
+                {
+                    await _navigationService.NavigateToAsync<IPersonViewModel>(async x => await x.LoadPerson(FindName ?? string.Empty));
+                    FindName = string.Empty;
+                }
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
         }
 
         private void Back()

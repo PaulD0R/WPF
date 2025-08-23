@@ -61,7 +61,7 @@ namespace WPFTest.ApiServices
                 return response;
 
             if (!await TryRefreshTokenAsync())
-                throw new ApiExeption(response.StatusCode);
+                throw new ApiException(response.StatusCode);
 
             return await requestFunc();
         }
@@ -75,8 +75,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<List<LightExercise>> GetByPageAsync(int page)
@@ -88,8 +88,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<ExercisesTasksFile> GetFileByIdAsync(int id)
@@ -101,8 +101,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<FullExercise?> GetByIdAsync(int id)
@@ -114,8 +114,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<bool> AddExerciseAsync(NewExercise exercise)
@@ -127,8 +127,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<ExerciseState?> ChangeIsLikedAsync(int id)
@@ -140,8 +140,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<ExerciseState?> GetLikesCountByIdAsync(int id)
@@ -153,8 +153,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<bool> AddCommentAsync(int id, NewComment comment)
@@ -166,8 +166,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<ICollection<FullComment>?> GetCommentsByIdAsync(int id)
@@ -179,8 +179,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public void Dispose()

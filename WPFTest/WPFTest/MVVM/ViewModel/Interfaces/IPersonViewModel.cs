@@ -14,6 +14,6 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         ICommand ChangeIsLikedCommand { get; }
         ICommand ExerciseViewCommand { get; }
 
-        public void LoadPerson(string name);
+        public Task LoadPerson(string name);
     }
 }

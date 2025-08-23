@@ -2,14 +2,14 @@
 
 namespace WPFTest.Exeptions
 {
-    public class ApiExeption : Exception
+    public class ApiException : Exception
     {
 
-        public ApiExeption(string error = "Ошибка") : base(error)
+        public ApiException(string error = "Ошибка") : base(error)
         {
         }
 
-        public ApiExeption(HttpStatusCode error) : base(GetErrorMessage(error))
+        public ApiException(HttpStatusCode error) : base(GetErrorMessage(error))
         {
         }
 

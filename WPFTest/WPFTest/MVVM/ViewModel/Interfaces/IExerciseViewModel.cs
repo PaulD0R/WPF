@@ -24,6 +24,6 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         ICommand ChangeIsLikedCommand { get; }
         ICommand CreateCommentCommand { get; }
 
-        void LoadExercise(int id);
+        Task LoadExercise(int id);
     }
 }

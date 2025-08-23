@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
@@ -26,9 +25,9 @@ namespace WPFTest.ApiServices
                 return await response.Content.ReadAsAsync<Token>();
 
             var error = await response.Content.ReadAsStringAsync();
-            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+            if (error == null || error == string.Empty) throw new ApiException(response.StatusCode);
 
-            throw new ApiExeption(error);
+            throw new ApiException(error);
             
         }
 
@@ -40,9 +39,9 @@ namespace WPFTest.ApiServices
                 return await response.Content.ReadAsAsync<Token>();
 
             var error = await response.Content.ReadAsStringAsync();
-            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+            if (error == null || error == string.Empty) throw new ApiException(response.StatusCode);
 
-            throw new ApiExeption(error);
+            throw new ApiException(error);
         }
 
         public async Task<Token> SigninWithToken(string token)
@@ -53,9 +52,9 @@ namespace WPFTest.ApiServices
                 return await response.Content.ReadAsAsync<Token>();
 
             var error = await response.Content.ReadAsStringAsync();
-            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+            if (error == null || error == string.Empty) throw new ApiException(response.StatusCode);
 
-            throw new ApiExeption(error);
+            throw new ApiException(error);
         }
 
         public async Task<bool> Logout()
@@ -70,9 +69,9 @@ namespace WPFTest.ApiServices
                 return true;
 
             var error = await response.Content.ReadAsStringAsync();
-            if (error == null || error == string.Empty) throw new ApiExeption(response.StatusCode);
+            if (error == null || error == string.Empty) throw new ApiException(response.StatusCode);
 
-            throw new ApiExeption(error);
+            throw new ApiException(error);
         }
     }
 }

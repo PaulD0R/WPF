@@ -13,6 +13,6 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         ICommand ExerciseViewCommand { get; }
         ICommand ChangeIsLikedCommand { get; }
 
-        void LoadSubject(int id);
+        Task LoadSubject(int id);
     }
 }

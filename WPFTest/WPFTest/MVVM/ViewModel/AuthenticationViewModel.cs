@@ -2,6 +2,7 @@
 using WPFTest.ApiServices;
 using WPFTest.Core;
 using WPFTest.Data;
+using WPFTest.Exeptions;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.Services;
 using WPFTest.Services.Interfaces;
@@ -38,12 +39,26 @@ namespace WPFTest.MVVM.ViewModel
 
         private void OpenSignin()
         {
-            _modelNavigationService.NavigateTo<ISigninViewModel>();
+            try
+            {
+                _modelNavigationService.NavigateTo<ISigninViewModel>();
+            } 
+            catch (ApiException ex)
+            {
+                _modelNavigationService.NavigateTo<IErrorViewModel>();
+            }
         }
 
         private void OpenSignup()
         {
-            _modelNavigationService.NavigateTo<ISignupViewModel>();
+            try
+            {
+                _modelNavigationService.NavigateTo<ISignupViewModel>();
+            }
+            catch (ApiException ex)
+            {
+                _modelNavigationService.NavigateTo<IErrorViewModel>();
+            }
         }
 
         private void ChangeCurrentView(object sender, object value)

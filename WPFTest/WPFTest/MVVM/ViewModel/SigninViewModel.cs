@@ -132,7 +132,7 @@ namespace WPFTest.MVVM.ViewModel
                     return;
                 }
             }
-            catch (ApiExeption ex)
+            catch (ApiException ex)
             {
                 ErrorText = ex.Message;
                 IsError = true;

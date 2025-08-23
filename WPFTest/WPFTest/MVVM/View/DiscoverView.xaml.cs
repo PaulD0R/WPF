@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using WPFTest.MVVM.ViewModel.Interfaces;
 
 namespace WPFTest.MVVM.View
 {

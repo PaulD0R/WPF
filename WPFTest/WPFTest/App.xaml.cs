@@ -41,8 +41,8 @@ namespace WPFTest
             services.AddTransient<IWindowNavigationService, WindowNavigationService>();
             services.AddTransient<IJwtService, JwtService>();
             services.AddTransient<ICheckCorrectServise, CheckCorrectService>();
+            services.AddTransient<IModelNavigationService, ModelNavigationService>();
             services.AddSingleton<INavigationService, NavigationService>();
-            services.AddSingleton<IModelNavigationService, ModelNavigationService>();
 
             services.AddTransient<IMainViewModel, MainViewModel>();
             services.AddTransient<IAuthenticationViewModel, AuthenticationViewModel>(); 

@@ -58,7 +58,7 @@ namespace WPFTest.ApiServices
                 return response;
 
             if (!await TryRefreshTokenAsync())
-                throw new ApiExeption(response.StatusCode);
+                throw new ApiException(response.StatusCode);
 
             return await requestFunc();
         }
@@ -72,8 +72,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<FullSubject?> GetByIdAsync(int id)
@@ -85,8 +85,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public async Task<bool> AddSubjectAsync(NewSubject subject)
@@ -98,8 +98,8 @@ namespace WPFTest.ApiServices
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)
-                ? new ApiExeption(response.StatusCode)
-                : new ApiExeption(error);
+                ? new ApiException(response.StatusCode)
+                : new ApiException(error);
         }
 
         public void Dispose()

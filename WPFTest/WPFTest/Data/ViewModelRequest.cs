@@ -1,6 +1,4 @@
-﻿
-
-namespace WPFTest.Data
+﻿namespace WPFTest.Data
 { 
     public class ViewModelRequest
     {

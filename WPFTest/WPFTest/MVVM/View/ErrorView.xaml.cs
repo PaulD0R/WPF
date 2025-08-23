@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Windows.Controls;
-using WPFTest.MVVM.ViewModel.Interfaces;
+﻿using System.Windows.Controls;
 
 namespace WPFTest.MVVM.View
 {

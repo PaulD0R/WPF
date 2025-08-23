@@ -28,12 +28,9 @@ namespace WPFTest.MVVM.ViewModel
             _exerciseService = exerciseService;
             _navigationService = navigationService;
 
-            ChangePageCommand = new RelayCommand(x => ChangePage((int)x));
-            ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int) x));
-            ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
-
-            LoadExercises();
-            LoadPages();
+            ChangePageCommand = new AsyncRelayCommand(async x => await ChangePage((int)x));
+            ExerciseViewCommand = new AsyncRelayCommand(async x => await OpenExerciseById((int) x));
+            ChangeIsLikedCommand = new AsyncRelayCommand(async x => await ChangeIsLiked((int)x));
         }
 
 
@@ -67,53 +64,58 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async void LoadExercises()
+        public async Task LoadExercises()
         {
-            try
-            {
-                var exercises = await _exerciseService.GetByPageAsync(_pageNumber);
-                Exercises = new ObservableCollection<LightExercise>(exercises);
-            } 
-            catch (ApiExeption ex)
-            {
-                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
-            }
+            var exercises = await _exerciseService.GetByPageAsync(_pageNumber);
+            Exercises = new ObservableCollection<LightExercise>(exercises);
         }
 
-        public async void LoadPages()
+        public async Task LoadPages()
         {
-            try
+            var pageCount = (double)await _exerciseService.GetCountAsync()
+                / (double)StaticData.NUMBER_OF_ELEMENTS_PER_PAGE;
+            var pages = new List<PageButtonData>();
+
+            if (pageCount > 0)
             {
-                var pageCount = (double)await _exerciseService.GetCountAsync()
-                    / (double)StaticData.NUMBER_OF_ELEMENTS_PER_PAGE;
-                var pages = new List<PageButtonData>();
-
-                if (pageCount > 0)
+                for (var i = 0; i < Math.Ceiling(pageCount); i++)
                 {
-                    for (var i = 0; i < Math.Ceiling(pageCount); i++)
-                    {
-                        pages.Add(new PageButtonData(i + 1, false));
-                    }
-
-                    pages[PageNumber - 1].IsChecked = true;
+                    pages.Add(new PageButtonData(i + 1, false));
                 }
 
-                Pages = pages;
+                pages[PageNumber - 1].IsChecked = true;
             }
-            catch (ApiExeption ex)
+
+            Pages = pages;
+        }
+        private async Task ChangePage(int number)
+        {
+            PageNumber = number;
+            await LoadExercises();
+        }
+
+        private async Task ChangeIsLiked(int id)
+        {
+            try
+            {
+                await _exerciseService.ChangeIsLikedAsync(id);
+            } 
+            catch
+            {
+                return;
+            }
+        }
+
+        private async Task OpenExerciseById(int id)
+        {
+            try
+            {
+                await _navigationService.NavigateToAsync<IExerciseViewModel>(async x => await x.LoadExercise(id));
+            }
+            catch (ApiException ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
-        }
-        private void ChangePage(int number)
-        {
-            PageNumber = number;
-            LoadExercises();
-        }
-
-        private void OpenExerciseById(int id)
-        {
-            _navigationService.NavigateTo<IExerciseViewModel>(x => x.LoadExercise(id));
         }
     }
 }

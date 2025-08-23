@@ -31,8 +31,8 @@ namespace WPFTest.MVVM.ViewModel
             _exerciseService = exerciseService;
             _navigationService = navigationService;
 
-            ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
-            ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int)x));
+            ChangeIsLikedCommand = new AsyncRelayCommand(async x => await ChangeIsLiked((int)x));
+            ExerciseViewCommand = new AsyncRelayCommand(async x => await OpenExerciseById((int)x));
         }
 
         public string? Id
@@ -75,37 +75,42 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public async void LoadPerson(string name)
+        public async Task LoadPerson(string name)
+        {
+            var person = await _personService.GetPersonByNameAsync(name);
+
+            if (person == null)
+            {
+                return;
+            }
+
+            Id = person.Id;
+            Name = person.Name;
+            Image = person.Image;
+            Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
+        }
+
+        private async Task OpenExerciseById(int id)
         {
             try
             {
-                var person = await _personService.GetPersonByNameAsync(name);
-
-                if (person == null)
-                {
-                    return;
-                }
-
-                Id = person.Id;
-                Name = person.Name;
-                Image = person.Image;
-                Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
+                await _navigationService.NavigateToAsync<IExerciseViewModel>(async x => await x.LoadExercise(id));
             }
-            catch (ApiExeption ex)
+            catch (ApiException ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        private void OpenExerciseById(int id)
+        private async Task ChangeIsLiked(int id)
         {
             try
             {
-                _navigationService.NavigateTo<IExerciseViewModel>(x => x.LoadExercise(id));
+                await _exerciseService.ChangeIsLikedAsync(id);
             }
-            catch (ApiExeption ex)
+            catch
             {
-                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+                return;
             }
         }
     }

@@ -40,8 +40,6 @@ namespace WPFTest.MVVM.ViewModel
             FileCommand = new RelayCommand(_ => File = ZipFileStreamer.SetFile());
             NewSubjectViewCommand = new RelayCommand(_ => OpenNewSubject());
             SaveCommand = new AsyncRelayCommand(async _ => await CreateNewExerciseAsync());
-
-            LoadSubjects();
         }
 
         public ICollection<LightSubject>? Subjects
@@ -113,16 +111,9 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        private async void LoadSubjects()
+        public async Task LoadSubjects()
         {
-            try
-            {
-                Subjects = await _subjectService.GetAllAsync();
-            }
-            catch (ApiExeption ex)
-            {
-                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
-            }
+            Subjects = await _subjectService.GetAllAsync();
         }
 
         private async Task CreateNewExerciseAsync()
@@ -161,7 +152,7 @@ namespace WPFTest.MVVM.ViewModel
                     IsError = true;
                 }
             }
-            catch (ApiExeption ex)
+            catch (ApiException ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
@@ -173,7 +164,7 @@ namespace WPFTest.MVVM.ViewModel
             {
                 _navigationService.NavigateTo<IErrorViewModel>();
             }
-            catch (ApiExeption ex)
+            catch (ApiException ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }

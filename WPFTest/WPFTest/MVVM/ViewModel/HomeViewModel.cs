@@ -46,10 +46,8 @@ namespace WPFTest.MVVM.ViewModel
             ChangeImageCommand = new AsyncRelayCommand(async _ => await ChangeImage());
             DeleteImageCommand = new AsyncRelayCommand(async _ => await DeleteImage());
             LogoutCommand = new AsyncRelayCommand(async _ => await  Logout());
-            ChangeIsLikedCommand = new AsyncRelayCommand(async x => await _exerciseService.ChangeIsLikedAsync((int)x));
-            ExerciseViewCommand = new RelayCommand(x => OpenExerciseById((int)x));
-
-            LoadPerson();
+            ChangeIsLikedCommand = new AsyncRelayCommand(async x => await ChangeIsLiked((int)x));
+            ExerciseViewCommand = new AsyncRelayCommand(async x => await OpenExerciseById((int)x));
         }
 
         public string? Id
@@ -102,6 +100,22 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
+        public async Task LoadPerson()
+        {
+            var person = await _personService.GetPrivateAsync();
+
+            if (person == null)
+            {
+                return;
+            }
+
+            Id = person.Id;
+            Name = person.Name;
+            Email = person.Email;
+            Image = person.Image;
+            Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
+        }
+
         private async Task ChangeImage()
         {
             try
@@ -114,7 +128,7 @@ namespace WPFTest.MVVM.ViewModel
                 if (newImageFile.Image != null)
                     Image = (await _personService.ChangePrivateImageAsync(newImageFile))?.Image;
             } 
-            catch (ApiExeption ex)
+            catch (Exception ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
@@ -127,15 +141,22 @@ namespace WPFTest.MVVM.ViewModel
                 if (await _personService.DeletePrivateImageAsync())
                     Image = null;
             }
-            catch (ApiExeption ex)
+            catch (Exception ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        private void OpenExerciseById(int id)
+        private async Task OpenExerciseById(int id)
         {
-            _navigationService.NavigateTo<IExerciseViewModel>(x => x.LoadExercise(id));
+            try
+            {
+                await _navigationService.NavigateToAsync<IExerciseViewModel>(async x => await x.LoadExercise(id));
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
         }
 
         private async Task Logout()
@@ -151,32 +172,21 @@ namespace WPFTest.MVVM.ViewModel
                     _windowNavigationService.ShowAndHideAnotherWindow<AuthenticationWindow>();
                 }
             }
-            catch (ApiExeption ex)
+            catch (ApiException ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }
         }
 
-        private async void LoadPerson()
+        private async Task ChangeIsLiked(int id)
         {
             try
             {
-                var person = await _personService.GetPrivateAsync();
-
-                if (person == null)
-                {
-                    return;
-                }
-
-                Id = person.Id;
-                Name = person.Name;
-                Email = person.Email;
-                Image = person.Image;
-                Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
+                await _exerciseService.ChangeIsLikedAsync(id);
             }
-            catch (ApiExeption ex)
+            catch
             {
-                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+                return;
             }
         }
     }

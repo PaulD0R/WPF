@@ -110,7 +110,7 @@ namespace WPFTest.MVVM.ViewModel
                     IsError = true;
                 }
             }
-            catch (ApiExeption ex)
+            catch (ApiException ex)
             {
                 _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
             }

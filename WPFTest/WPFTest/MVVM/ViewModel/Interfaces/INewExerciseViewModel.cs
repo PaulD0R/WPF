@@ -16,5 +16,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         ICommand FileCommand { get; }
         ICommand SaveCommand { get; }
         ICommand NewSubjectViewCommand { get; }
+
+        Task LoadSubjects();
     }
 }
