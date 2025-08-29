@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.FileStreamers;
@@ -13,15 +13,15 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class NewExerciseViewModel : ObserverItem, INewExerciseViewModel
     {
-        private readonly ApiExerciseService _exerciseService;
-        private readonly ApiSubjectService _subjectService;
+        private readonly IApiExerciseService _exerciseService;
+        private readonly IApiSubjectService _subjectService;
         private readonly INavigationService _navigationService;
 
         private int? _subjectId = 1;
         private int? _number = 1;
         private string? _task = string.Empty;
         private byte[]? _file = [];
-        private ICollection<LightSubject>? _subjects = [];
+        private ICollection<LiteSubject>? _subjects = [];
         private bool? _isError = false;
         private string? _errorText = string.Empty;
 
@@ -30,7 +30,7 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand NewSubjectViewCommand { get; }
 
 
-        public NewExerciseViewModel(ApiExerciseService exerciseiService, ApiSubjectService subjectService, 
+        public NewExerciseViewModel(IApiExerciseService exerciseiService, IApiSubjectService subjectService, 
             INavigationService navigationService)
         {
             _exerciseService = exerciseiService;
@@ -42,7 +42,7 @@ namespace WPFTest.MVVM.ViewModel
             SaveCommand = new AsyncRelayCommand(async _ => await CreateNewExerciseAsync());
         }
 
-        public ICollection<LightSubject>? Subjects
+        public ICollection<LiteSubject>? Subjects
         {
             get => _subjects;
             set
@@ -162,7 +162,7 @@ namespace WPFTest.MVVM.ViewModel
         {
             try
             {
-                _navigationService.NavigateTo<IErrorViewModel>();
+                _navigationService.NavigateTo<INewSubjectViewModel>();
             }
             catch (ApiException ex)
             {

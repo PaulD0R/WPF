@@ -1,6 +1,6 @@
-﻿namespace WPFServer.DTOs.Subject
+﻿namespace WPFTest.MVVM.Model.Subject
 {
-    public class LightSubjectDto
+    public class LiteSubject
     {
         public int Id { get; set; }
         public string? Name { get; set; }

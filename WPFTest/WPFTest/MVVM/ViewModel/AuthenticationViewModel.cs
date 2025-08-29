@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Data;
 using WPFTest.Exeptions;
@@ -11,14 +11,14 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class AuthenticationViewModel : ObserverItem, IAuthenticationViewModel, IDisposable
     {
-        private readonly ApiAuthenticationService _authenticationServixe;
+        private readonly IApiAuthenticationService _authenticationServixe;
         private readonly IWindowNavigationService _windowNvigationService;
         private readonly IModelNavigationService _modelNavigationService;
 
         public ICommand SigninCommand { get; }
         public ICommand SignupCommand { get; }
 
-        public AuthenticationViewModel(ApiAuthenticationService authenticationService, 
+        public AuthenticationViewModel(IApiAuthenticationService authenticationService, 
             IWindowNavigationService windowNavigationService, IModelNavigationService modelNavigationService)
         {
             _windowNvigationService = windowNavigationService;

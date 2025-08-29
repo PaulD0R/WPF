@@ -12,6 +12,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         ICommand HomeCommand { get; }
         ICommand DiscoverCommand { get; }
         ICommand NewExercisesCommand { get; }
+        ICommand AdminCommand { get; }
         ICommand FindPersonCommand { get; }
         ICommand BackCommand { get; }
     }

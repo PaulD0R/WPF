@@ -8,7 +8,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         string? Name { get; set; }
         int? Year { get; set; }
         string? Description { get; set; }
-        ICollection<LightExercise>? Exercises { get; set; }
+        ICollection<LiteExercise>? Exercises { get; set; }
 
         ICommand ExerciseViewCommand { get; }
         ICommand ChangeIsLikedCommand { get; }

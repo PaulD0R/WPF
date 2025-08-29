@@ -138,11 +138,29 @@ namespace WPFServer.Controllers
         [HttpGet("{id:int}/Comments")]
         public async Task<IActionResult> GetComments([FromRoute] int id)
         {
+            var personId = User.GetId();
+
+            if (personId == null) return Unauthorized("Не авторизирован");
+
             var comments = await _commentRepository.GetCommentsByExerciseIdAsync(id);
 
             if (comments == null) return NotFound("Комментарий не найден");
 
-            return Ok(comments.Select(x => x.ToCommentDto()));
+            return Ok(comments.Select(x => x.ToCommentDto(personId)));
+        }
+
+        [HttpGet("{id:int}/Comments/Person")]
+        public async Task<IActionResult> GetPersonComment([FromRoute] int id)
+        {
+            var personId = User.GetId();
+
+            if (personId == null) return Unauthorized("Не авторизирован");
+
+            var comments = await _commentRepository.GetPersonCommentsByExerciseId(id, personId);
+
+            if (comments == null) return NotFound("Коментарий не найден");
+
+            return Ok(comments.Select(x => x.ToCommentDto(personId)));
         }
     }
 }

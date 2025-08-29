@@ -1,6 +1,6 @@
 ﻿namespace WPFTest.MVVM.Model.Exercise
 {
-    public class LightExercise
+    public class LiteExercise
     {
         public int Id { get; set; }
         public string? Subject {  get; set; }

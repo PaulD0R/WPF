@@ -17,14 +17,25 @@ namespace WPFServer.Extensions.Mappers
             };
         }
 
-        public static CommentDto ToCommentDto(this Comment comment)
+        public static CommentDto ToCommentDto(this Comment comment, string personId)
         {
             return new CommentDto
             {
                 Id = comment.Id,
                 UserName = comment.UserName,
                 Text = comment.Text,
-                Date = comment.Date.Value.ToString("dd.MM.yyyy")
+                Date = comment.Date.Value.ToString("dd.MM.yyyy"),
+                IsPerson = comment.PersonId == personId
+            };
+        }
+
+        public static LiteCommentDto ToLightCommentDto(this Comment comment)
+        {
+            return new LiteCommentDto
+            {
+                Id = comment.Id,
+                PersonId = comment.PersonId,
+                Text = comment.Text
             };
         }
     }

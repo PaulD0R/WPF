@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Subject;
@@ -10,7 +10,7 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class NewSubjectViewModel : ObserverItem, INewSubjectViewModel
     {
-        private readonly ApiSubjectService _apiSubjectService;
+        private readonly IApiSubjectService _apiSubjectService;
         private readonly INavigationService _navigationService;
 
         private string? _name = string.Empty;
@@ -21,7 +21,7 @@ namespace WPFTest.MVVM.ViewModel
 
         public ICommand SaveCommand { get; }
 
-        public NewSubjectViewModel(ApiSubjectService apiSubjectService, INavigationService navigationService)
+        public NewSubjectViewModel(IApiSubjectService apiSubjectService, INavigationService navigationService)
         {
             _apiSubjectService = apiSubjectService;
             _navigationService = navigationService;

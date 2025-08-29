@@ -53,7 +53,7 @@ namespace WPFServer.Extensions.Mappers
             };
         }
 
-        public static FullExerciseDto ToFullExerciseDto(this Exercise exercise, bool isLiked)
+        public static FullExerciseDto ToFullExerciseDto(this Exercise exercise, string personId)
         {
             return new FullExerciseDto()
             {
@@ -62,22 +62,8 @@ namespace WPFServer.Extensions.Mappers
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
                 Subject = exercise.Subject?.ToLightSubjectDto(),
-                IsLiked = isLiked,
-                Comments = exercise.Comments?.Select(x => x.ToCommentDto()).ToList()
-            };
-        }
-
-        public static FullExerciseDto ToFullExerciseDto(this Exercise exercise, string userName)
-        {
-            return new FullExerciseDto()
-            {
-                Id = exercise.Id,
-                Number = exercise.Number,
-                Task = exercise.Task,
-                SubjectId = exercise.SubjectId,
-                Subject = exercise.Subject?.ToLightSubjectDto(),
-                IsLiked = exercise.Persons?.Any(p => p.UserName == userName) ?? false,
-                Comments = exercise.Comments?.Select(x => x.ToCommentDto()).ToList()
+                IsLiked = exercise.Persons?.Any(p => p.Id == personId) ?? false,
+                Comments = exercise.Comments?.Select(x => x.ToCommentDto(personId)).ToList()
             };
         }
     }

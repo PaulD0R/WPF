@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.MVVM.ViewModel;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.Services;
@@ -33,14 +34,15 @@ namespace WPFTest
 
         private static void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<ApiAuthenticationService>();
-            services.AddTransient<ApiExerciseService>();
-            services.AddTransient<ApiSubjectService>();
-            services.AddTransient<ApiPersonService>();
+            services.AddTransient<IApiAuthenticationService, ApiAuthenticationService>();
+            services.AddTransient<IApiExerciseService, ApiExerciseService>();
+            services.AddTransient<IApiSubjectService, ApiSubjectService>();
+            services.AddTransient<IApiPersonService, ApiPersonService>();
+            services.AddTransient<IApiAdminService, ApiAdminService>();
 
             services.AddTransient<IWindowNavigationService, WindowNavigationService>();
             services.AddTransient<IJwtService, JwtService>();
-            services.AddTransient<ICheckCorrectServise, CheckCorrectService>();
+            services.AddTransient<ICheckCorrectService, CheckCorrectService>();
             services.AddTransient<IModelNavigationService, ModelNavigationService>();
             services.AddSingleton<INavigationService, NavigationService>();
 
@@ -56,6 +58,7 @@ namespace WPFTest
             services.AddTransient<ISubjectViewModel, SubjectViewModel>();
             services.AddTransient<IPersonViewModel, PersonViewModel>();
             services.AddTransient<IErrorViewModel, ErrorViewModel>();
+            services.AddTransient<IAdminViewModel, AdminViewModel>();
 
             services.AddTransient<MainWindow>();
             services.AddTransient<AuthenticationWindow>();

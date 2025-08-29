@@ -9,7 +9,7 @@ namespace WPFTest.MVVM.Model.Exercise
         public int? Number { get; set; }
         public string? Task {  get; set; }
         public int SubjectId { get; set; }
-        public LightSubject? Subject { get; set; }
+        public LiteSubject? Subject { get; set; }
         public bool? IsLiked { get; set; }
         public ICollection<FullComment>? Comments { get; set; }
     }

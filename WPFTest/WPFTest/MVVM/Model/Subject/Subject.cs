@@ -7,6 +7,6 @@ namespace WPFTest.MVVM.Model.Subject
         public int Id { get; set; }
         public string? Name { get; set; }
         public int? Year { get; set; }
-        public ICollection<LightExercise>? Exercises { get; set; }
+        public ICollection<LiteExercise>? Exercises { get; set; }
     }
 }

@@ -44,5 +44,14 @@ namespace WPFServer.Repositories
 
             return exercise.Comments;
         }
+
+        public async Task<ICollection<Comment>?> GetPersonCommentsByExerciseId(int exerciseId, string personId)
+        {
+            var exercise = await _context.Exercises.Include(x => x.Comments).FirstOrDefaultAsync(x => x.Id == exerciseId);
+
+            if (exercise == null) return null;
+
+            return exercise.Comments?.Where(x => x.PersonId == personId).ToList();
+        }
     }
 }

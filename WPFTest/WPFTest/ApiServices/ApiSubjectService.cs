@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Subject;
@@ -7,68 +8,19 @@ using WPFTest.Services;
 
 namespace WPFTest.ApiServices
 {
-    public class ApiSubjectService : IDisposable
+    public class ApiSubjectService : ApiWithRefreshTokenService, IApiSubjectService
     {
-        private readonly HttpClient _httpClient;
-        private readonly ApiAuthenticationService _authenticationService;
-
-        public ApiSubjectService(ApiAuthenticationService authenticationService)
+        public ApiSubjectService(IApiAuthenticationService authenticationService)
+            : base(authenticationService, StaticData.SUBJECT_ROUDE)
         {
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(StaticData.SUBJECT_ROUDE)
-            };
-
-            _authenticationService = authenticationService;
-            UpdateAuthorizationHeader();
-
-            StaticData.OnTokenChanged += OnTokenChanged;
         }
 
-        private void UpdateAuthorizationHeader()
-        {
-            _httpClient.DefaultRequestHeaders.Remove("Authorization");
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + StaticData.TOKEN);
-        }
-
-        private void OnTokenChanged(object sender, string newToken)
-        {
-            UpdateAuthorizationHeader();
-        }
-
-        private async Task<bool> TryRefreshTokenAsync()
-        {
-            var token = TokenStorageService.LoadRefreshToken();
-            if (string.IsNullOrEmpty(token)) return false;
-
-            var tokens = await _authenticationService.SigninWithToken(token);
-            if (tokens?.Jwt == null || tokens.RefreshToken == null) return false;
-
-            StaticData.TOKEN = tokens.Jwt;
-            TokenStorageService.SaveRefreshToken(tokens.RefreshToken);
-            UpdateAuthorizationHeader();
-            return true;
-        }
-
-        private async Task<HttpResponseMessage> ExecuteRequestWithTokenRefreshAsync(Func<Task<HttpResponseMessage>> requestFunc)
-        {
-            var response = await requestFunc();
-
-            if (response.StatusCode != HttpStatusCode.Unauthorized)
-                return response;
-
-            if (!await TryRefreshTokenAsync())
-                throw new ApiException(response.StatusCode);
-
-            return await requestFunc();
-        }
-
-        public async Task<ICollection<LightSubject>> GetAllAsync()
+        public async Task<ICollection<LiteSubject>> GetAllAsync()
         {
             var response = await ExecuteRequestWithTokenRefreshAsync(() => _httpClient.GetAsync(""));
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<List<LightSubject>>();
+                return await response.Content.ReadAsAsync<List<LiteSubject>>();
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)

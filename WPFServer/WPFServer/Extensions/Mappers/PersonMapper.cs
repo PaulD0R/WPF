@@ -5,6 +5,15 @@ namespace WPFServer.Extensions.Mappers
 {
     public static class PersonMapper
     {
+        public static Person ToPerson(this UpdatePersonRequest updatePersonRequest)
+        {
+            return new Person
+            {
+                UserName = updatePersonRequest.Name,
+                Email = updatePersonRequest.Email
+            };
+        }
+
         public static Person ToPerson(this NewPersonRequest newPersonRequest)
         {
             return new Person {
@@ -24,9 +33,9 @@ namespace WPFServer.Extensions.Mappers
             };
         }
 
-        public static LightPersonDto ToLightPersonDto(this Person person)
+        public static LitePersonDto ToLightPersonDto(this Person person)
         {
-            return new LightPersonDto
+            return new LitePersonDto
             {
                 Id = person.Id,
                 Name = person.UserName

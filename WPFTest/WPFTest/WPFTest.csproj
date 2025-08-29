@@ -12,10 +12,18 @@
   <ItemGroup>
     <None Remove="Images\Back.png" />
     <None Remove="Images\Close.png" />
+    <None Remove="Images\Delete.png" />
     <None Remove="Images\Failed.png" />
     <None Remove="Images\Find.png" />
     <None Remove="Images\FullSize.png" />
     <None Remove="Images\NotFound.png" />
+    <None Remove="Images\Open.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Images\Open.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +48,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Close.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Delete.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Failed.png">
@@ -70,10 +81,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ApiServices\Interfaces\" />
   </ItemGroup>
 
 </Project>

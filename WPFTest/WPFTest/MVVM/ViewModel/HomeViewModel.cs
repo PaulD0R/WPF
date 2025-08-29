@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Data;
 using WPFTest.Exeptions;
@@ -15,9 +15,9 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class HomeViewModel : ObserverItem, IHomeViewModel
     {
-        private readonly ApiPersonService _personService;
-        private readonly ApiExerciseService _exerciseService;
-        private readonly ApiAuthenticationService _authenticationService;
+        private readonly IApiPersonService _personService;
+        private readonly IApiExerciseService _exerciseService;
+        private readonly IApiAuthenticationService _authenticationService;
         private readonly INavigationService _navigationService;
         private readonly IWindowNavigationService _windowNavigationService;
 
@@ -25,7 +25,7 @@ namespace WPFTest.MVVM.ViewModel
         private string? _name = string.Empty;
         private string? _email = string.Empty;
         private byte[]? _image = [];
-        private ObservableCollection<LightExercise>? _exercises = [];
+        private ObservableCollection<LiteExercise>? _exercises = [];
 
         public ICommand ChangeImageCommand { get; }
         public ICommand DeleteImageCommand { get; }
@@ -33,8 +33,8 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ExerciseViewCommand { get; }
         public ICommand LogoutCommand { get; }
 
-        public HomeViewModel(ApiPersonService personService, ApiExerciseService exerciseService, 
-            ApiAuthenticationService authenticationService, IWindowNavigationService windowNavigationService, 
+        public HomeViewModel(IApiPersonService personService, IApiExerciseService exerciseService, 
+            IApiAuthenticationService authenticationService, IWindowNavigationService windowNavigationService, 
             INavigationService navigationService)
         {
             _personService = personService;
@@ -90,7 +90,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public ObservableCollection<LightExercise>? Exercises
+        public ObservableCollection<LiteExercise>? Exercises
         {
             get => _exercises;
             set
@@ -113,7 +113,7 @@ namespace WPFTest.MVVM.ViewModel
             Name = person.Name;
             Email = person.Email;
             Image = person.Image;
-            Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
+            Exercises = new ObservableCollection<LiteExercise>(person.Exercises ?? []);
         }
 
         private async Task ChangeImage()

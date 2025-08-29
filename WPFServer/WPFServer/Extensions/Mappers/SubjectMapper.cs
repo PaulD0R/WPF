@@ -28,9 +28,9 @@ namespace WPFServer.Extensions.Mappers
             };
         }
 
-        public static LightSubjectDto ToLightSubjectDto(this Subject subject)
+        public static LiteSubjectDto ToLightSubjectDto(this Subject subject)
         {
-            return new LightSubjectDto()
+            return new LiteSubjectDto()
             {
                 Id = subject.Id,
                 Name = subject.Name,

@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.FileStreamers;
@@ -12,8 +12,8 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class ExerciseViewModel : ObserverItem, IExerciseViewModel
     {
-        private readonly ApiExerciseService _exerciseService;
-        private readonly ApiPersonService _personService;
+        private readonly IApiExerciseService _exerciseService;
+        private readonly IApiPersonService _personService;
         private readonly INavigationService _navigationService;
 
         private int _id = 0;
@@ -33,18 +33,20 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand LoadTasksFileCommand { get; }
         public ICommand ChangeIsLikedCommand { get; }
         public ICommand CreateCommentCommand { get; }
+        public ICommand DeleteCommentCommand { get; }
 
-        public ExerciseViewModel(ApiExerciseService apiExerciseService, ApiPersonService personService, 
+        public ExerciseViewModel(IApiExerciseService apiExerciseService, IApiPersonService personService, 
             INavigationService navigationService)
         {
             _exerciseService = apiExerciseService;
             _personService = personService;
             _navigationService = navigationService;
 
-            SubjectViewCommand = new AsyncRelayCommand(async _ => await OpenSubject());
+            SubjectViewCommand = new AsyncRelayCommand(async _ => await OpenSubjectAsync());
             LoadTasksFileCommand = new AsyncRelayCommand(async _ => await GetExercisesTasksFileAsync());
-            ChangeIsLikedCommand = new AsyncRelayCommand(async _ => await ChangeIsLiked());
+            ChangeIsLikedCommand = new AsyncRelayCommand(async _ => await ChangeIsLikedAsync());
             CreateCommentCommand = new AsyncRelayCommand(async _ => await CreateCommentAsync());
+            DeleteCommentCommand = new AsyncRelayCommand(async x => await DeleteCommentAsync((int)x));
         }
 
         public int Id 
@@ -186,7 +188,7 @@ namespace WPFTest.MVVM.ViewModel
             return exerciseState.LikesCount;
         }
 
-        private async Task OpenSubject()
+        private async Task OpenSubjectAsync()
         {
             try
             {
@@ -211,7 +213,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        private async Task ChangeIsLiked()
+        private async Task ChangeIsLikedAsync()
         {
             await _exerciseService.ChangeIsLikedAsync(Id);
             LikesCount = await GetLikesCount();
@@ -249,6 +251,19 @@ namespace WPFTest.MVVM.ViewModel
                     IsError = true;
                     return;
                 }
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
+        }
+
+        private async Task DeleteCommentAsync(int id)
+        {
+            try
+            {
+                if (await _personService.DeleteCommentAsync(id))
+                    Comments = new ObservableCollection<FullComment>(await _exerciseService.GetCommentsByIdAsync(Id) ?? []);
             }
             catch (ApiException ex)
             {

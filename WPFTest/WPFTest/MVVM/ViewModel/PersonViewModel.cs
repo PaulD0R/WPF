@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Exercise;
@@ -12,19 +12,19 @@ namespace WPFTest.MVVM.ViewModel
     public class PersonViewModel : ObserverItem, IPersonViewModel
     {
 
-        private readonly ApiPersonService _personService;
-        private readonly ApiExerciseService _exerciseService;
+        private readonly IApiPersonService _personService;
+        private readonly IApiExerciseService _exerciseService;
         private readonly INavigationService _navigationService;
 
         private string? _id = null;
         private string? _name = string.Empty;
         private byte[]? _image = [];
-        private ObservableCollection<LightExercise>? _exercises;
+        private ObservableCollection<LiteExercise>? _exercises;
 
         public ICommand ChangeIsLikedCommand { get; }
         public ICommand ExerciseViewCommand { get; }
 
-        public PersonViewModel(ApiPersonService personService, ApiExerciseService exerciseService, 
+        public PersonViewModel(IApiPersonService personService, IApiExerciseService exerciseService, 
             INavigationService navigationService)
         {
             _personService = personService;
@@ -65,7 +65,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public ObservableCollection<LightExercise>? Exercises
+        public ObservableCollection<LiteExercise>? Exercises
         {
             get => _exercises;
             set
@@ -87,7 +87,7 @@ namespace WPFTest.MVVM.ViewModel
             Id = person.Id;
             Name = person.Name;
             Image = person.Image;
-            Exercises = new ObservableCollection<LightExercise>(person.Exercises ?? []);
+            Exercises = new ObservableCollection<LiteExercise>(person.Exercises ?? []);
         }
 
         private async Task OpenExerciseById(int id)

@@ -10,7 +10,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         string? Name {  get; set; }
         string? Email {  get; set; }
         byte[]? Image {  get; set; }
-        ObservableCollection<LightExercise>? Exercises {  get; set; }
+        ObservableCollection<LiteExercise>? Exercises {  get; set; }
 
         ICommand ChangeImageCommand { get; }
         ICommand DeleteImageCommand { get; }

@@ -1,5 +1,4 @@
 ﻿using System.Windows.Input;
-using WPFTest.MVVM.Model.Person;
 
 namespace WPFTest.MVVM.ViewModel.Interfaces
 {

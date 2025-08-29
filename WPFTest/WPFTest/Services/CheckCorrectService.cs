@@ -3,7 +3,7 @@ using WPFTest.Services.Interfaces;
 
 namespace WPFTest.Services
 {
-    internal class CheckCorrectService : ICheckCorrectServise
+    public class CheckCorrectService : ICheckCorrectService
     {
         public bool IsEmail(string email)
         {

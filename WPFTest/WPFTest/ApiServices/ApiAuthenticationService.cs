@@ -1,11 +1,12 @@
 ﻿using System.Net.Http;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Person;
 
 namespace WPFTest.ApiServices
 {
-    public class ApiAuthenticationService
+    public class ApiAuthenticationService : IApiAuthenticationService
     {
         private readonly HttpClient _httpClient;
 

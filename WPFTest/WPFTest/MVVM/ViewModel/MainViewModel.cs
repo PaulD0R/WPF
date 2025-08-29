@@ -20,6 +20,7 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand HomeCommand { get; }
         public ICommand DiscoverCommand { get; }
         public ICommand NewExercisesCommand { get; }
+        public ICommand AdminCommand { get; }
         public ICommand FindPersonCommand { get; }
         public ICommand BackCommand { get; }
 
@@ -31,6 +32,7 @@ namespace WPFTest.MVVM.ViewModel
             HomeCommand = new AsyncRelayCommand(async _ => await OpenHome());
             DiscoverCommand = new AsyncRelayCommand(async _ => await OpenDiscover());
             NewExercisesCommand = new AsyncRelayCommand(async _ => await OpenNewExercise());
+            AdminCommand = new AsyncRelayCommand(async _ => await OpenAdmin());
             FindPersonCommand = new AsyncRelayCommand(async _ => await OpenPerson());
             BackCommand = new RelayCommand(_ => Back());
 
@@ -115,6 +117,18 @@ namespace WPFTest.MVVM.ViewModel
             try
             {
                 await _navigationService.NavigateToAsync<INewExerciseViewModel>(async x => await x.LoadSubjects());
+            }
+            catch (ApiException ex)
+            {
+                _navigationService.NavigateTo<IErrorViewModel>(x => x.LoadError(ex.Message));
+            }
+        }
+
+        private async Task OpenAdmin()
+        {
+            try
+            {
+                await _navigationService.NavigateToAsync<IAdminViewModel>(async x => await x.LoadUsers());
             }
             catch (ApiException ex)
             {

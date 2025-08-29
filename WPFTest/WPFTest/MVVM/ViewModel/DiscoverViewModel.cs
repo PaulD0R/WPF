@@ -2,20 +2,20 @@
 using System.Collections.ObjectModel;
 using WPFTest.Data;
 using System.Windows.Input;
-using WPFTest.ApiServices;
 using WPFTest.MVVM.ViewModel.Interfaces;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.Exeptions;
 using WPFTest.Services.Interfaces;
+using WPFTest.ApiServices.Interfaces;
 
 namespace WPFTest.MVVM.ViewModel
 {
     public class DiscoverViewModel : ObserverItem, IDiscoverViewModel
     {
-        private readonly ApiExerciseService _exerciseService;
+        private readonly IApiExerciseService _exerciseService;
         private readonly INavigationService _navigationService;
 
-        private ObservableCollection<LightExercise> _exercises = [];
+        private ObservableCollection<LiteExercise> _exercises = [];
         private List<PageButtonData> _pages = [];
         private int _pageNumber = 1;
 
@@ -23,7 +23,7 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand ExerciseViewCommand { get; }
         public ICommand ChangeIsLikedCommand { get; }
 
-        public DiscoverViewModel(ApiExerciseService exerciseService, INavigationService navigationService)
+        public DiscoverViewModel(IApiExerciseService exerciseService, INavigationService navigationService)
         {
             _exerciseService = exerciseService;
             _navigationService = navigationService;
@@ -34,7 +34,7 @@ namespace WPFTest.MVVM.ViewModel
         }
 
 
-        public ObservableCollection<LightExercise> Exercises
+        public ObservableCollection<LiteExercise> Exercises
         {
             get => _exercises;
             set
@@ -67,7 +67,7 @@ namespace WPFTest.MVVM.ViewModel
         public async Task LoadExercises()
         {
             var exercises = await _exerciseService.GetByPageAsync(_pageNumber);
-            Exercises = new ObservableCollection<LightExercise>(exercises);
+            Exercises = new ObservableCollection<LiteExercise>(exercises);
         }
 
         public async Task LoadPages()

@@ -155,8 +155,19 @@
                             </Button>
                         </StackPanel>
 
-                        <Button Grid.Column="1"
-                                Style="{StaticResource CircleButton}" 
+                        <StackPanel HorizontalAlignment="Right"
+                                    Orientation="Horizontal"
+                                    Grid.Column="1">
+                            <Button Style="{StaticResource CircleButton}" 
+                                Content="Админ" 
+                                Width="200" 
+                                Height="40" 
+                                Margin="0, 0, 10, 0"
+                                Foreground="White"
+                                Command="{Binding AdminCommand}"
+                                Visibility="{Binding IsAddVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            
+                            <Button Style="{StaticResource CircleButton}" 
                                 Content="Добавить задание" 
                                 Width="200" 
                                 Height="40" 
@@ -164,6 +175,7 @@
                                 Foreground="White"
                                 Command="{Binding NewExercisesCommand}"
                                 Visibility="{Binding IsAddVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </StackPanel>
                     </Grid>
                 </StackPanel>
 

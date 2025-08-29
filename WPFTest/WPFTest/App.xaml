@@ -57,6 +57,10 @@
             <DataTemplate DataType="{x:Type viewModel:ErrorViewModel}">
                 <view:ErrorView/>
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type viewModel:AdminViewModel}">
+                <view:AdminView/>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

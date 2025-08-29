@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
-using System.Windows.Input;
-using WPFTest.ApiServices;
+﻿using System.Windows.Input;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Exercise;
@@ -11,20 +10,20 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class SubjectViewModel : ObserverItem, ISubjectViewModel
     {
-        private readonly ApiExerciseService _exerciseService;
-        private readonly ApiSubjectService _subjectService;
+        private readonly IApiExerciseService _exerciseService;
+        private readonly IApiSubjectService _subjectService;
         private readonly INavigationService _navigationService;
 
 
         private string? _name = string.Empty;
         private int? _year = null;
         private string? _description = string.Empty;
-        private ICollection<LightExercise>? _exercises;
+        private ICollection<LiteExercise>? _exercises;
 
         public ICommand ExerciseViewCommand { get; }
         public ICommand ChangeIsLikedCommand { get; }
 
-        public SubjectViewModel(ApiSubjectService subjectService, ApiExerciseService exerciseService,
+        public SubjectViewModel(IApiSubjectService subjectService, IApiExerciseService exerciseService,
             INavigationService navigationService)
         {
             _subjectService = subjectService;
@@ -65,7 +64,7 @@ namespace WPFTest.MVVM.ViewModel
             }
         }
 
-        public ICollection<LightExercise>? Exercises
+        public ICollection<LiteExercise>? Exercises
         {
             get => _exercises;
             set

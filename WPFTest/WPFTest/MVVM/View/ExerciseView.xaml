@@ -15,8 +15,7 @@
     </UserControl.Resources>
     
     <Border>
-        <ScrollViewer Visibility="{Binding IsLoaded, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      VerticalScrollBarVisibility="Hidden"
+        <ScrollViewer VerticalScrollBarVisibility="Hidden"
                       HorizontalScrollBarVisibility="Hidden">
             <StackPanel Orientation="Vertical"
                         Width="800">
@@ -204,24 +203,44 @@
                                     Background="#333540"
                                     BorderThickness="0"
                                     Margin="5">
-                                <StackPanel>
-                                    <TextBlock Text='{Binding UserName}'
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <Button Grid.Column="0"
+                                            Background="Transparent"
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Left"
+                                            Margin="5"
+                                            MaxWidth="40"
+                                            BorderThickness="0"
+                                            Visibility="{Binding IsPerson, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                            Command="{Binding DataContext.DeleteCommentCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding Id}">
+                                        <Image Source="/Images/Delete.png"/>
+                                    </Button>
+                                    
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text='{Binding UserName}'
                                                FontSize="20"
                                                Foreground="White"
                                                Margin="15, 15, 15, 5"/>
 
-                                    <TextBlock Text="{Binding Text}"
+                                        <TextBlock Text="{Binding Text}"
                                                FontSize="15"
                                                Foreground="White"
                                                Margin="15, 0, 15, 5"
                                                TextWrapping="Wrap"/>
 
-                                    <TextBlock Text="{Binding Date}"
+                                        <TextBlock Text="{Binding Date}"
                                                FontSize="10"
                                                Foreground="White"
                                                Margin="15, 0, 15, 15"
                                                HorizontalAlignment="Right"/>
-                                </StackPanel>
+                                    </StackPanel>
+                                </Grid>
                             </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

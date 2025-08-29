@@ -1,5 +1,5 @@
 ﻿using System.Windows.Input;
-using WPFTest.ApiServices;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Core;
 using WPFTest.Data;
 using WPFTest.Exeptions;
@@ -12,8 +12,8 @@ namespace WPFTest.MVVM.ViewModel
 {
     public class SignupViewModel : ObserverItem, ISignupViewModel
     {
-        private readonly ApiAuthenticationService _authenticationService;
-        private readonly ICheckCorrectServise _checkCorrectServise;
+        private readonly IApiAuthenticationService _authenticationService;
+        private readonly ICheckCorrectService _checkCorrectServise;
         private readonly IWindowNavigationService _windowNavigationService;
         private readonly INavigationService _navigationService;
 
@@ -27,7 +27,7 @@ namespace WPFTest.MVVM.ViewModel
         public ICommand PasswordCommand { get; }
         public ICommand SignupCommand { get; }
 
-        public SignupViewModel(ApiAuthenticationService authenticationService, ICheckCorrectServise checkCorrectServise, 
+        public SignupViewModel(IApiAuthenticationService authenticationService, ICheckCorrectService checkCorrectServise, 
             IWindowNavigationService windowNavigationService, INavigationService navigationService)
         {
             _checkCorrectServise = checkCorrectServise;

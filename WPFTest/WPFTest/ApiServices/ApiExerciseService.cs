@@ -1,69 +1,19 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
+using WPFTest.ApiServices.Interfaces;
 using WPFTest.Data;
 using WPFTest.Exeptions;
 using WPFTest.MVVM.Model.Comments;
 using WPFTest.MVVM.Model.Data;
 using WPFTest.MVVM.Model.Exercise;
 using WPFTest.MVVM.Model.Files;
-using WPFTest.Services;
 
 namespace WPFTest.ApiServices
 {
-    public class ApiExerciseService : IDisposable
+    public class ApiExerciseService : ApiWithRefreshTokenService, IApiExerciseService
     {
-        private readonly HttpClient _httpClient;
-        private readonly ApiAuthenticationService _authenticationService;
-
-        public ApiExerciseService(ApiAuthenticationService authenticationService)
+        public ApiExerciseService(IApiAuthenticationService authenticationService) 
+            : base(authenticationService, StaticData.EXERCISE_ROUDE)
         {
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(StaticData.EXERCISE_ROUDE)
-            };
-
-            UpdateAuthorizationHeader();
-            _authenticationService = authenticationService;
-
-            StaticData.OnTokenChanged += OnTokenChanged;
-        }
-
-        private void UpdateAuthorizationHeader()
-        {
-            _httpClient.DefaultRequestHeaders.Remove("Authorization");
-            _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + StaticData.TOKEN);
-        }
-
-        private void OnTokenChanged(object sender, string newToken)
-        {
-            UpdateAuthorizationHeader();
-        }
-
-        private async Task<bool> TryRefreshTokenAsync()
-        {
-            var token = TokenStorageService.LoadRefreshToken();
-            if (string.IsNullOrEmpty(token)) return false;
-
-            var tokens = await _authenticationService.SigninWithToken(token);
-            if (tokens?.Jwt == null || tokens.RefreshToken == null) return false;
-
-            StaticData.TOKEN = tokens.Jwt;
-            TokenStorageService.SaveRefreshToken(tokens.RefreshToken);
-            UpdateAuthorizationHeader();
-            return true;
-        }
-
-        private async Task<HttpResponseMessage> ExecuteRequestWithTokenRefreshAsync(Func<Task<HttpResponseMessage>> requestFunc)
-        {
-            var response = await requestFunc();
-
-            if (response.StatusCode != HttpStatusCode.Unauthorized)
-                return response;
-
-            if (!await TryRefreshTokenAsync())
-                throw new ApiException(response.StatusCode);
-
-            return await requestFunc();
         }
 
         public async Task<int> GetCountAsync()
@@ -79,12 +29,12 @@ namespace WPFTest.ApiServices
                 : new ApiException(error);
         }
 
-        public async Task<List<LightExercise>> GetByPageAsync(int page)
+        public async Task<List<LiteExercise>> GetByPageAsync(int page)
         {
             var response = await ExecuteRequestWithTokenRefreshAsync(() => _httpClient.GetAsync($"Page{page}"));
 
             if (response.IsSuccessStatusCode)
-                return await response.Content.ReadAsAsync<List<LightExercise>>();
+                return await response.Content.ReadAsAsync<List<LiteExercise>>();
 
             var error = await response.Content.ReadAsStringAsync();
             throw string.IsNullOrEmpty(error)

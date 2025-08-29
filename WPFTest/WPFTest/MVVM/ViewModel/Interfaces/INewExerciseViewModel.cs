@@ -9,7 +9,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         int? Number { get; set; }
         string? Task { get; set; }
         byte[]? File { get; set; }
-        ICollection<LightSubject>? Subjects { get; set; }
+        ICollection<LiteSubject>? Subjects { get; set; }
         bool? IsError { get; set; }
         string? ErrorText { get; set; }
 

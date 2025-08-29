@@ -23,6 +23,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
         ICommand LoadTasksFileCommand { get; }
         ICommand ChangeIsLikedCommand { get; }
         ICommand CreateCommentCommand { get; }
+        ICommand DeleteCommentCommand { get; }
 
         Task LoadExercise(int id);
     }

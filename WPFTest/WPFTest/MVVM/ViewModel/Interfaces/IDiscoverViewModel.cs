@@ -7,7 +7,7 @@ namespace WPFTest.MVVM.ViewModel.Interfaces
 {
     public interface IDiscoverViewModel
     {
-        ObservableCollection<LightExercise> Exercises { get; set; }
+        ObservableCollection<LiteExercise> Exercises { get; set; }
         List<PageButtonData> Pages {  get; set; }
         int PageNumber {  get; set; }
 

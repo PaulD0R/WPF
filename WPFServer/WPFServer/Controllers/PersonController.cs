@@ -138,7 +138,7 @@ namespace WPFServer.Controllers
             if (id == null) return Unauthorized("Не авторизирован");
 
             var comments = await _personRepository.GetCommentsByIdAsync(id);
-            return Ok(comments?.Select(x => x.ToCommentDto()));
+            return Ok(comments?.Select(x => x.ToCommentDto(id)));
         }
 
         [HttpDelete("Me/Comments/Delete/{commentId:int}")]

@@ -8,6 +8,7 @@
         public const string SUBJECT_ROUDE = @"https://localhost:7145/WPF/Subjects/";
         public const string AUTHENTICATION_ROUDE = @"https://localhost:7145/WPF/Authentication/";
         public const string PERSON_ROUDE = @"https://localhost:7145/WPF/Persons/";
+        public const string ADMIN_ROUDE = @"https://localhost:7145/WPF/Admin/";
 
         private static string _token { get; set; } = string.Empty;
         public static EventHandler<string> OnTokenChanged { get; set; }

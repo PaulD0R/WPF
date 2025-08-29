@@ -4,7 +4,7 @@ namespace WPFServer.DTOs.Person
 {
     public class RoleRequestcs
     {
-        [Required]
+        [Required(ErrorMessage = "Задайте роль")]
         public string? Role {  get; set; }
     }
 }
