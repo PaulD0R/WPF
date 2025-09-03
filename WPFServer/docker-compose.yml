@@ -1,0 +1,33 @@
+services:
+  wpfserver:
+    image: ${DOCKER_REGISTRY-}wpfserver
+    build:
+      context: .
+      dockerfile: WPFServer/Dockerfile
+    ports:
+      - "8080:8080"
+      - "443:443" 
+    container_name: "first-wpf-server"
+    depends_on: 
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=PaulDor
+      - DB_PASSWORD=2486
+
+  db:
+    image: mysql:latest  
+    ports:
+      - "3306:3306"     
+    environment:
+      MYSQL_ROOT_PASSWORD: 2486         
+      MYSQL_USER: PaulDor
+      MYSQL_PASSWORD: 2486
+      MYSQL_DATABASE: wpfdb             
+    volumes:
+      - db_data:/var/lib/mysql       
+    restart: unless-stopped
+
+volumes:
+  db_data:

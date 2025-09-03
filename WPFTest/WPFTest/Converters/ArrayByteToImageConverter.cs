@@ -8,7 +8,7 @@ namespace WPFTest.Converters
     public class ArrayByteToImageConverter : IValueConverter
     {
         private static readonly string DefaultImagePath =
-            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "NotFound.png");
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Images", "NoImage.jpg");
 
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

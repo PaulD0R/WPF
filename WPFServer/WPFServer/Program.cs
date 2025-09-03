@@ -17,7 +17,7 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 });
 builder.Services.AddMemoryCache();
 builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=WPF;Trusted_Connection=True;"));
+    options.UseMySQL(StaticData.CONNECTION_STRING));
 
 builder.Services.AddIdentity<Person, IdentityRole>( options =>
 {
@@ -102,5 +102,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();

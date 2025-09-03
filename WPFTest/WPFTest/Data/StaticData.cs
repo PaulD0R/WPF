@@ -4,11 +4,12 @@
     {
         public const int NUMBER_OF_ELEMENTS_PER_PAGE = 20;
 
-        public const string EXERCISE_ROUDE = @"https://localhost:7145/WPF/Exercises/";
-        public const string SUBJECT_ROUDE = @"https://localhost:7145/WPF/Subjects/";
-        public const string AUTHENTICATION_ROUDE = @"https://localhost:7145/WPF/Authentication/";
-        public const string PERSON_ROUDE = @"https://localhost:7145/WPF/Persons/";
-        public const string ADMIN_ROUDE = @"https://localhost:7145/WPF/Admin/";
+        private const string MAIN_ROUDE = @"http://localhost:8080/WPF";
+        public const string EXERCISE_ROUDE = MAIN_ROUDE + @"/Exercises/";
+        public const string SUBJECT_ROUDE = MAIN_ROUDE + @"/Subjects/";
+        public const string AUTHENTICATION_ROUDE = MAIN_ROUDE + @"/Authentication/";
+        public const string PERSON_ROUDE = MAIN_ROUDE + @"/Persons/";
+        public const string ADMIN_ROUDE = MAIN_ROUDE + @"/Admin/";
 
         private static string _token { get; set; } = string.Empty;
         public static EventHandler<string> OnTokenChanged { get; set; }

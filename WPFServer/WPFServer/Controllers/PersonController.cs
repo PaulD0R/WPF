@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WPFServer.DTOs.Person;
 using WPFServer.DTOs.PersonsFiles;
 using WPFServer.Extensions;
 using WPFServer.Extensions.Mappers;
@@ -39,17 +38,6 @@ namespace WPFServer.Controllers
             return Ok(personDto);
         }
 
-        [HttpPatch("Id/{id}/AddRole")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AddRoleById([FromRoute] string id, [FromBody] RoleRequestcs role)
-        {
-            var result = await _personRepository.AddRoleByIdAsync(id, role?.Role ?? string.Empty);
-
-            if (!result) return NotFound("Пользователь не найден");
-
-            return Ok();
-        }
-
         [HttpGet("Name/{name}")]
         public async Task<ActionResult> GetByName([FromRoute] string name)
         {
@@ -67,14 +55,6 @@ namespace WPFServer.Controllers
             }
 
             return Ok(personDto);
-        }
-
-        [HttpGet("Name/{name}/Similar")]
-        public async Task<ActionResult> GetByNameSimilar([FromRoute] string name)
-        {
-            var persons = await _personRepository.GetByNameSimilarsAsync(name);
-
-            return Ok(persons.Select(x => x.ToLightPersonDto()));
         }
 
         [HttpGet("Me")]

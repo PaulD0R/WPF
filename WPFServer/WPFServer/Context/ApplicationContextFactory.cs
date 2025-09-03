@@ -9,7 +9,7 @@ namespace WPFServer.Context
         public ApplicationContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationContext>();
-            optionsBuilder.UseSqlServer(StaticData.CONNECTION_STRING);
+            optionsBuilder.UseMySQL(StaticData.CONNECTION_STRING);
 
             return new ApplicationContext(optionsBuilder.Options);
         }

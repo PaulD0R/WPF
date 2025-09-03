@@ -29,7 +29,8 @@ namespace WPFServer.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlServer(StaticData.CONNECTION_STRING);
+            //options.UseSqlServer(StaticData.CONNECTION_STRING);
+            options.UseMySQL(StaticData.CONNECTION_STRING); 
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

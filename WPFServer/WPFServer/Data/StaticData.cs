@@ -7,7 +7,8 @@
         public const int MAX_REQUEST_SIZE = 1024 * 1024 * 100;
 
         //DataBase
-        public const string CONNECTION_STRING = @"Server=(localdb)\MSSQLLocalDB;Database=WPF;Trusted_Connection=True;";
+        //public const string CONNECTION_STRING = @"Server=localhost;Database=wpf_database;Uid=PaulDor;Pwd=2486;";
+        public const string CONNECTION_STRING = @"Server=db;Port=3306;Database=wpfdb;User=PaulDor;Password=2486;";
 
         //Auth
         public const string ISSURE = "TestWPFServer";

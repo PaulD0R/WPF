@@ -16,11 +16,15 @@
     <None Remove="Images\Failed.png" />
     <None Remove="Images\Find.png" />
     <None Remove="Images\FullSize.png" />
+    <None Remove="Images\NoImage.jpg" />
     <None Remove="Images\NotFound.png" />
     <None Remove="Images\Open.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Images\NoImage.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Open.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
