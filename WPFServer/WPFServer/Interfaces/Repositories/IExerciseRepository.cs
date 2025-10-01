@@ -1,7 +1,7 @@
 ﻿using WPFServer.DTOs.ExercisesFiles;
 using WPFServer.Models;
 
-namespace WPFServer.Interfaces
+namespace WPFServer.Interfaces.Repositories
 {
     public interface IExercisesRepository
     {
@@ -13,7 +13,6 @@ namespace WPFServer.Interfaces
         Task<int> GetLengthAsync();
         int GetLength();
         Task AddAsync(Exercise exercise);
-        Task<ExercisesFilesDto?> GetTasksFileByIdAsync(int id);
         Task<bool?> ChangeIsLikedAsync(string personId, int id);
         Task<int?> GetLikesCountByIdAsync(int id);
     }
