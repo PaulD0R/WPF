@@ -1,0 +1,28 @@
+﻿version: '3.8'
+
+services:
+  first-wpf-server:
+    container_name: "first-wpf-server"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=asdfgh67
+      - DB_NAME=wpf_db
+
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: asdfgh67
+      POSTGRES_DB: wpf_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  db_data:

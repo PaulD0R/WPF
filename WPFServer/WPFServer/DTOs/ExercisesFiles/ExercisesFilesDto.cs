@@ -2,6 +2,6 @@
 {
     public class ExercisesFilesDto
     {
-        public byte[]? TasksFile { get; set; }
+        public byte[] TasksFile { get; set; } = null!;
     }
 }

@@ -1,15 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WPFServer.Context;
 using WPFServer.Data;
-using WPFServer.DTOs.ExercisesFiles;
-using WPFServer.Extensions.Mappers;
-using WPFServer.Interfaces;
 using WPFServer.Interfaces.Repositories;
 using WPFServer.Models;
 
 namespace WPFServer.Repositories
 {
-    public class ExercisesRepository(ApplicationContext context): IExercisesRepository
+    public class ExerciseRepository(ApplicationContext context): IExerciseRepository
     {
         public async Task<ICollection<Exercise>> GetAllAsync()
         {
@@ -22,6 +19,21 @@ namespace WPFServer.Repositories
             return await context.Exercises.Include(x => x.Subject)
                 .Include(x => x.Persons)
                 .FirstOrDefaultAsync(x => x.Id == id);
+        }
+
+        public async Task<ICollection<Exercise>> GetByPersonIdAsync(string personId)
+        {
+            return await context.Exercises.Include(x => x.Subject)
+                .Include(x => x.Persons)
+                .Where(x => x.Persons.Any(y => y.Id == personId))
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<Exercise>> GetBySubjectIdAsync(int subjectId)
+        {
+            return await context.Exercises.Include(x => x.Subject)
+                .Include(x => x.Persons).Where(x => x.SubjectId == subjectId)
+                .ToListAsync();
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -44,7 +56,7 @@ namespace WPFServer.Repositories
                 .Take(StaticData.NUMBER_OF_ELEMENTS_PER_PAGE).ToListAsync();
         }
 
-        public async Task<int> GetLengthAsync()
+        public async Task<int> GetCountAsync()
         {
             return await context.Exercises.CountAsync();
         }
@@ -61,26 +73,32 @@ namespace WPFServer.Repositories
             return context.Exercises.Count();
         }
 
-        public async Task AddAsync(Exercise exercise)
+        public async Task<bool> AddAsync(Exercise exercise)
         {
-            await context.Exercises.AddAsync(exercise);
+            try
+            {
+                await context.Exercises.AddAsync(exercise);
 
-            var exercisesFiles = exercise.ExercisesFiles;
+                var exercisesFiles = exercise.ExercisesFiles;
 
-            exercisesFiles.ExerciseId = exercise.Id;
+                exercisesFiles.ExerciseId = exercise.Id;
 
-            await context.ExercisesFiles.AddAsync(exercisesFiles);
-            await context.SaveChangesAsync();
+                await context.ExercisesFiles.AddAsync(exercisesFiles);
+                await context.SaveChangesAsync();
+
+                return true;
+            }
+            catch { return false; }
         }
 
         public async Task<bool?> ChangeIsLikedAsync(string personId, int id)
         {
             var exercise = await context.Exercises.Include(x => x.Persons)
                 .FirstOrDefaultAsync(x => x.Id == id);
-            var person = await context.Persons.FirstOrDefaultAsync(x => x.Id == personId);
-
-            if (person == null) return null;
             if (exercise == null) return null;
+            
+            var person = await context.Persons.FirstOrDefaultAsync(x => x.Id == personId);
+            if (person == null) return null;
 
             if (!exercise.Persons.Remove(person))
             {
@@ -91,6 +109,7 @@ namespace WPFServer.Repositories
             }
 
             await context.SaveChangesAsync();
+            
             return false;
         }
 
@@ -98,7 +117,6 @@ namespace WPFServer.Repositories
         {
             var exercise = await context.Exercises.Include(x => x.Persons)
                 .FirstOrDefaultAsync(x => x.Id == id);
-
             return exercise?.Persons.Count;
         }
     }

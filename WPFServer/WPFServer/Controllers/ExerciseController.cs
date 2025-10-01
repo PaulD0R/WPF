@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using WPFServer.DTOs.Comment;
 using WPFServer.DTOs.Exercise;
 using WPFServer.Extensions;
-using WPFServer.Extensions.Mappers;
-using WPFServer.Interfaces;
+using WPFServer.Interfaces.Services;
 
 namespace WPFServer.Controllers
 {
@@ -13,154 +12,100 @@ namespace WPFServer.Controllers
     [EnableCors("AllowAll")]
     [Authorize]
     [ApiController]
-    public class ExerciseController : ControllerBase
+    public class ExerciseController(
+        IExerciseService  exerciseService,
+        ICommentService  commentService)
+        : ControllerBase
     {
-        private readonly IExercisesRepository _exercisesRepository;
-        private readonly IPersonRepository _personRepository;
-        private readonly ICommentRepository _commentRepository;
-
-        public ExerciseController(IExercisesRepository exercisesRepository, IPersonRepository personRepository, ICommentRepository commentRepository)
-        {
-            _exercisesRepository = exercisesRepository;
-            _personRepository = personRepository;
-            _commentRepository = commentRepository;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var personId = User.GetId();
-            var exercises = await _exercisesRepository.GetAllAsync();
-
             if (personId == null) return Unauthorized("Не авторизирован");
-
-            var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personId)).ToList();
-
-            return Ok(exercisesDtos);
+            
+            return Ok(await exerciseService.GetAllAsync(personId));
         }
 
         [HttpGet("Count")]
         public async Task<IActionResult> Count()
         {
-            var count = await _exercisesRepository.GetLengthAsync();
-            return Ok(count);
+            return Ok(await exerciseService.CountAsync());
         }
 
         [HttpGet("Page{page:int}")]
         public async Task<IActionResult> GetByPage([FromRoute] int page)
         {
-            var exercises = await _exercisesRepository.GetByPageAsync(page);
             var personId = User.GetId();
-
             if (personId == null) return Unauthorized("Не авторизирован");
-            if (exercises == null) return NotFound("Упражнение не найдено");
 
-            var exercisesDtos = exercises.Select(x => x.ToExerciseDto(personId)).ToList();
-
-            return Ok(exercisesDtos);
+            return Ok(await exerciseService.GetByPageAsync(page, personId));
         }
 
         [HttpGet("{id:int}/File/Task")]
         public async Task<IActionResult> GetTasksFileById([FromRoute] int id)
         {
-            var file = await _exercisesRepository.GetTasksFileByIdAsync(id);
-
-            if (file == null) return NotFound("Некорректный запрос");
-
-            return Ok(file);
+            return Ok(await exerciseService.GetTaskAsync(id));
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var exercise = await _exercisesRepository.GetByIdAsync(id);
             var personId = User.GetId();
-
             if (personId == null) return Unauthorized("Не авторизирован");
-            if (exercise == null) return NotFound("Упражнение не найдено");
 
-            return Ok(exercise.ToFullExerciseDto(personId));
+            return Ok(await exerciseService.GetByIdAsync(id, personId));
         }
 
         [HttpPost("Add")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Add([FromBody] NewExerciseRequest request)
         {
-            var exercise = request.ToExercise();
-
-            if (exercise == null) return BadRequest("Некорректный запрос");
-
-            await _exercisesRepository.AddAsync(exercise);
-
-            return Ok();
+            var exercise = await exerciseService.AddAsync(request);
+            return CreatedAtAction(nameof(GetById), new { exercise.Id }, exercise);
         }
 
         [HttpGet("{id:int}/LikesCount")]
         public async Task<IActionResult> GetLikesCount([FromRoute] int id)
         {
-            var likesCount = await _exercisesRepository.GetLikesCountByIdAsync(id);
-
-            if (likesCount == null) return NotFound("Упражнение не найдено");
-
-            return Ok(new { LikesCount = likesCount });
+            return Ok(await exerciseService.LikesCountAsync(id));
         }
 
         [HttpPut("{id:int}/isLiked")]
         public async Task<IActionResult> ChangeIsLicked([FromRoute] int id)
         {
             var personId = User.GetId();
-
             if (personId == null) return Unauthorized("Не авторизирован");
 
-            var isLicked = await _exercisesRepository.ChangeIsLikedAsync(personId, id);
-            return Ok(new { isLiked = isLicked});
+            await exerciseService.SwitchIsLikedAsync(id, personId);
+            return NoContent();
         }
 
         [HttpPost("{id:int}/Comments/Add")]
         public async Task<IActionResult> AddComment([FromRoute] int id, [FromBody] CommentRequest request)
         {
-            var exercise = await _exercisesRepository.GetByIdAsync(id);
-            var userId = User.GetId();
-
-            if (userId == null) return Unauthorized("Не авторизирован");
-            if (exercise == null) return NotFound("Упражнение не найдено");
-
-            var person = await _personRepository.GetByIdAsync(userId);
-
-            if (person == null) return NotFound("Пользователь не найден");
-
-            var comment = request.ToComment(person, id);
-
-            await _commentRepository.AddAsync(comment);
-            return Ok();
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
+            
+            return CreatedAtAction(nameof(GetAll),
+                await commentService.AddCommentAsync(id, personId, request));
         }
 
         [HttpGet("{id:int}/Comments")]
         public async Task<IActionResult> GetComments([FromRoute] int id)
         {
             var personId = User.GetId();
-
             if (personId == null) return Unauthorized("Не авторизирован");
 
-            var comments = await _commentRepository.GetCommentsByExerciseIdAsync(id);
-
-            if (comments == null) return NotFound("Комментарий не найден");
-
-            return Ok(comments.Select(x => x.ToCommentDto(personId)));
+            return Ok(await commentService.GetCommentsByExerciseIdAsync(id, personId));
         }
 
         [HttpGet("{id:int}/Comments/Person")]
         public async Task<IActionResult> GetPersonComment([FromRoute] int id)
         {
             var personId = User.GetId();
-
             if (personId == null) return Unauthorized("Не авторизирован");
 
-            var comments = await _commentRepository.GetPersonCommentsByExerciseId(id, personId);
-
-            if (comments == null) return NotFound("Коментарий не найден");
-
-            return Ok(comments.Select(x => x.ToCommentDto(personId)));
+            return Ok(await commentService.GetPersonCommentsByExerciseIdAsync(id, personId));
         }
     }
 }

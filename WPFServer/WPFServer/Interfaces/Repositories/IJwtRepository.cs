@@ -1,6 +1,6 @@
 ﻿using WPFServer.Models;
 
-namespace WPFServer.Interfaces
+namespace WPFServer.Interfaces.Repositories
 {
     public interface IJwtRepository
     {

@@ -4,28 +4,22 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using WPFServer.Data;
-using WPFServer.Interfaces;
+using WPFServer.Interfaces.Repositories;
 using WPFServer.Models;
 
 namespace WPFServer.Repositories
 {
     public class JwtRepository(UserManager<Person> userManager) : IJwtRepository
     {
-        private readonly UserManager<Person> _userManager = userManager;
-
         public async Task<string> CreateJwtAsync(Person person)
         {
-            var roles = await _userManager.GetRolesAsync(person);
+            var roles = await userManager.GetRolesAsync(person);
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.NameId, person.Id),
-                new(JwtRegisteredClaimNames.GivenName, person.UserName)
+                new(JwtRegisteredClaimNames.GivenName, person.UserName ?? string.Empty)
             };
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var jwt = new JwtSecurityToken(
                     issuer: StaticData.ISSURE,

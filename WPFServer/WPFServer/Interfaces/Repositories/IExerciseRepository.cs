@@ -1,18 +1,19 @@
-﻿using WPFServer.DTOs.ExercisesFiles;
-using WPFServer.Models;
+﻿using WPFServer.Models;
 
 namespace WPFServer.Interfaces.Repositories
 {
-    public interface IExercisesRepository
+    public interface IExerciseRepository
     {
         Task<ICollection<Exercise>> GetAllAsync();
         Task<Exercise?> GetByIdAsync(int id);
+        Task<ICollection<Exercise>> GetByPersonIdAsync(string personId);
+        Task<ICollection<Exercise>> GetBySubjectIdAsync(int subjectId);
         Task<bool> DeleteAsync(int id);
         Task<ICollection<Exercise>> GetByPageAsync(int pageNumber);
         ICollection<Exercise> GetByPage(int pageNumber);
-        Task<int> GetLengthAsync();
+        Task<int> GetCountAsync();
         int GetLength();
-        Task AddAsync(Exercise exercise);
+        Task<bool> AddAsync(Exercise exercise);
         Task<bool?> ChangeIsLikedAsync(string personId, int id);
         Task<int?> GetLikesCountByIdAsync(int id);
     }

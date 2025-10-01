@@ -1,54 +1,67 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using WPFServer.Context;
-using WPFServer.Interfaces;
+using WPFServer.Interfaces.Repositories;
 using WPFServer.Models;
 
 namespace WPFServer.Repositories
 {
     public class RefreshTokenRepository(ApplicationContext context) : IRefreshTokenRepository
     {
-        private readonly ApplicationContext _context = context;
-
-        public async Task<string> CreateRefreshTokenAsync(Person person)
+        public async Task<string> CreateNewRefreshTokenAsync(Person person)
         {
-            var refershToken = new RefreshToken
+            var refreshToken = new RefreshToken
             {
                 Id = Guid.NewGuid().ToString(),
                 PersonId = person.Id,
-                Token = CreateToken(),
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)),
                 LiveTime = DateTime.UtcNow.AddDays(7)
             };
+            
+            await context.RefreshTokens.AddAsync(refreshToken);
+            await context.SaveChangesAsync();
 
-            var oldTokens = await _context.RefreshTokens.Where(x => x.PersonId == person.Id).ToListAsync();
-
-            _context.RefreshTokens.RemoveRange(oldTokens);
-
-            await _context.RefreshTokens.AddAsync(refershToken);
-            await _context.SaveChangesAsync();
-
-            return refershToken.Token;
+            return refreshToken.Token;
         }
 
-        public string CreateToken()
+        public async Task<bool> DeleteOldRefreshTokensAsync(string personId)
         {
-            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+            var oldTokens = await context.RefreshTokens
+                .Where(x => x.PersonId == personId).ToListAsync();
+
+            context.RefreshTokens.RemoveRange(oldTokens);
+
+            return true;
+        }
+
+        public async Task<RefreshToken?> GetRefreshTokenByTokenAsync(string token)
+        {
+            return await context.RefreshTokens.Include(x => x.Person)
+                .FirstOrDefaultAsync(x => x.Token == token);
+        }
+
+        public async Task<RefreshToken> UpdateRefreshToken(RefreshToken refreshToken)
+        {
+            refreshToken.LiveTime = DateTime.UtcNow.AddDays(7);
+            refreshToken.Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+
+            await context.SaveChangesAsync();
+            
+            return refreshToken;
         }
 
         public async Task<bool> DeleteRefreshToken(string id)
         {
-            var token = await _context.RefreshTokens
+            var token = await context.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.PersonId == id);
 
-            if (token != null)
-            {
-                _context.RefreshTokens.Remove(token);
-                await _context.SaveChangesAsync();
+            if (token == null) return false;
+            
+            context.RefreshTokens.Remove(token);
+            await context.SaveChangesAsync();
 
-                return true;
-            }
+            return true;
 
-            return false;
         }
     }
 }

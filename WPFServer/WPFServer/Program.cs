@@ -1,24 +1,45 @@
+using System.IO.Compression;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.ResponseCompression;
+using StackExchange.Redis;
 using WPFServer.Context;
 using WPFServer.Data;
-using WPFServer.Interfaces;
+using WPFServer.ExceptionHandlers;
+using WPFServer.Interfaces.Managers;
+using WPFServer.Interfaces.Repositories;
+using WPFServer.Interfaces.Services;
+using WPFServer.Managers;
 using WPFServer.Models;
 using WPFServer.Repositories;
+using WPFServer.Services.Caching;
+using WPFServer.Services.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
 builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
-builder.Services.AddMemoryCache();
 builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseMySQL(StaticData.CONNECTION_STRING));
-
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+{
+    var configuration = builder.Configuration.GetConnectionString("Redis");
+    return ConnectionMultiplexer.Connect(configuration ?? "localhost");
+});
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "WPF";
+});
 builder.Services.AddIdentity<Person, IdentityRole>( options =>
 {
     options.Password.RequireDigit = true;
@@ -27,7 +48,6 @@ builder.Services.AddIdentity<Person, IdentityRole>( options =>
     options.Password.RequireUppercase = true;
     options.Password.RequiredLength = 8;
 }).AddEntityFrameworkStores<ApplicationContext>();
-
 builder.Services.AddAuthentication( options =>
 {
     options.DefaultAuthenticateScheme =
@@ -51,15 +71,37 @@ builder.Services.AddAuthentication( options =>
 });
 builder.Services.AddAuthorization().AddControllers();
 
-builder.Services.AddScoped<IExercisesRepository, ExercisesRepository>();
+builder.Services.AddScoped<IDatabase>(sp =>
+{
+    var connection = sp.GetRequiredService<IConnectionMultiplexer>();
+    return connection.GetDatabase();
+});
+
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddScoped<IStringCachingService, StringCachingService>();
+builder.Services.AddScoped<IHashCachingService, HashCachingService>();
+builder.Services.AddScoped<IListCachingService, ListCachingService>();
+
+builder.Services.AddScoped<ICachingManager, CachingManager>();
+
+builder.Services.AddScoped<IExerciseRepository, ExerciseRepository>();
+builder.Services.AddScoped<IExerciseFilesRepository, ExerciseFilesRepository>();
 builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
-builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IPersonsFilesRepository, PersonsFilesRepository>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IJwtRepository, JwtRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+builder.Services.AddScoped<IPersonService, PersonService>();
+builder.Services.AddScoped<IExerciseService, ExerciseService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
 
 builder.Services.AddCors(options =>
 {
@@ -72,6 +114,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+{
+    options.Level = CompressionLevel.Fastest;
+});
+
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
@@ -80,6 +127,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
 app.UseStatusCodePages(async statusCodeContext =>
 {
     var response = statusCodeContext.HttpContext.Response;
@@ -87,14 +135,17 @@ app.UseStatusCodePages(async statusCodeContext =>
 
     await response.WriteAsync(response.StatusCode switch
     {
-        404 => "Не найдено",
-        400 => "Неверный запрос",
-        401 => "Не авторизован",
-        403 => "Доступ запрещен",
-        _ => "Ошибка"
+        404 => "Not Found",
+        400 => "400",
+        401 => "401",
+        403 => "403",
+        _ => "Fail"
     });
 });
 
+app.UseExceptionHandler();
+
+app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAll");
@@ -102,12 +153,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
-    dbContext.Database.Migrate();
-}
 
 app.Run();

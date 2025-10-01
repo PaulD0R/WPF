@@ -7,30 +7,29 @@ namespace WPFServer.Extensions.Mappers
     {
         public static Subject ToSubject(this NewSubjectRequest subjectRequest)
         {
-            return new Subject()
+            return new Subject
             {
-                Name = subjectRequest.Name,
-                Year = subjectRequest.Year,
-                Description = subjectRequest.Description,
+                Name = subjectRequest.Name ??  string.Empty,
+                Year = subjectRequest.Year ?? 0,
+                Description = subjectRequest.Description ??  string.Empty,
                 Exercises = []
             };
         }
 
-        public static SubjectDto ToSubjectDto(this Subject subject, string userId)
+        public static SubjectDto ToSubjectDto(this Subject subject)
         {
-            return new SubjectDto()
+            return new SubjectDto
             {
                 Id = subject.Id,
                 Name = subject.Name,
                 Year = subject.Year,
-                Description = subject.Description,
-                Exercises = subject.Exercises?.Select(x => x.ToExerciseDto(userId)).ToList()
+                Description = subject.Description
             };
         }
 
-        public static LiteSubjectDto ToLightSubjectDto(this Subject subject)
+        public static LiteSubjectDto ToLiteSubjectDto(this Subject subject)
         {
-            return new LiteSubjectDto()
+            return new LiteSubjectDto
             {
                 Id = subject.Id,
                 Name = subject.Name,

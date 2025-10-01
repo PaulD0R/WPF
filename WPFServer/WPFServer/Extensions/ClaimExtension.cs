@@ -2,7 +2,7 @@
 
 namespace WPFServer.Extensions
 {
-    public static class ClaimExtensions
+    public static class ClaimExtension
     {
         public static string? GetUserName(this ClaimsPrincipal principal)
         {

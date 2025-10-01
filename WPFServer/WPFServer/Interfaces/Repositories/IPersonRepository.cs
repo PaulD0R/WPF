@@ -1,6 +1,6 @@
 ﻿using WPFServer.Models;
 
-namespace WPFServer.Interfaces
+namespace WPFServer.Interfaces.Repositories
 {
     public interface IPersonRepository
     {
@@ -9,7 +9,6 @@ namespace WPFServer.Interfaces
         public Task<Person?> GetLiteByIdAsync(string id);
         public Task<ICollection<Person>> GetByNameSimilarsAsync(string name);
         public Task<ICollection<Person>> GetAllAsync();
-        public Task<ICollection<Comment>?> GetCommentsByIdAsync(string id);
         public Task<bool?> GetIsLikedByIdAsync(string id, int exerciseId);
         public Task<bool> AddRoleByIdAsync(string id, string role);
         public Task<bool> DeleteRoleByIdAsync(string id, string role);

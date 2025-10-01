@@ -5,6 +5,18 @@ namespace WPFServer.Extensions.Mappers
 {
     public static class ExerciseMapper
     {
+        public static ExerciseDto ToExerciseDto(this Exercise exercise)
+        {
+            return new ExerciseDto
+            {
+                Id = exercise.Id,
+                Number = exercise.Number,
+                Task = exercise.Task,
+                SubjectId = exercise.SubjectId,
+                Subject = exercise.Subject.Name
+            };
+        }
+        
         public static ExerciseDto ToExerciseDto(this Exercise exercise, bool isLiked)
         {
             return new ExerciseDto
@@ -13,32 +25,21 @@ namespace WPFServer.Extensions.Mappers
                 Number = exercise.Number,
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
-                Subject = exercise.Subject?.Name,
+                Subject = exercise.Subject.Name,
                 IsLiked = isLiked
             };
         }
 
         public static ExerciseDto ToExerciseDto(this Exercise exercise, string userId)
         {
-            return new ExerciseDto()
+            return new ExerciseDto
             {
                 Id = exercise.Id,
                 Number = exercise.Number,
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
-                Subject = exercise.Subject?.Name,
-                IsLiked = exercise.Persons?.Any(p => p.Id == userId) ?? false
-            };
-        }
-
-        public static Exercise ToExercise(this ExerciseRequest exerciseRequest)
-        {
-            return new Exercise
-            {
-                Number = exerciseRequest.Number,
-                Task = exerciseRequest.Task,
-                SubjectId = exerciseRequest.SubjectId,
-                Comments = []
+                Subject = exercise.Subject.Name,
+                IsLiked = exercise.Persons.Any(p => p.Id == userId)
             };
         }
 
@@ -46,24 +47,23 @@ namespace WPFServer.Extensions.Mappers
         {
             return new Exercise
             {
-                Number = exerciseRequest.Number,
-                Task = exerciseRequest.Task,
+                Number = exerciseRequest.Number ?? 0,
+                Task = exerciseRequest.Task  ??  string.Empty,
                 SubjectId = exerciseRequest.SubjectId,
-                ExercisesFiles = exerciseRequest.Files?.ToExercisesFiles()
+                ExercisesFiles = exerciseRequest.Files!.ToExercisesFiles()
             };
         }
 
         public static FullExerciseDto ToFullExerciseDto(this Exercise exercise, string personId)
         {
-            return new FullExerciseDto()
+            return new FullExerciseDto
             {
                 Id = exercise.Id,
                 Number = exercise.Number,
                 Task = exercise.Task,
                 SubjectId = exercise.SubjectId,
-                Subject = exercise.Subject?.ToLightSubjectDto(),
-                IsLiked = exercise.Persons?.Any(p => p.Id == personId) ?? false,
-                Comments = exercise.Comments?.Select(x => x.ToCommentDto(personId)).ToList()
+                Subject = exercise.Subject.ToLiteSubjectDto(),
+                IsLiked = exercise.Persons.Any(p => p.Id == personId)
             };
         }
     }

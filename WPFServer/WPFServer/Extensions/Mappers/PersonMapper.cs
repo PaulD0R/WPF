@@ -27,18 +27,18 @@ namespace WPFServer.Extensions.Mappers
             return new PersonDto
             {
                 Id = person.Id,
-                Name = person.UserName,
-                Email = person.Email,
+                Name = person.UserName ?? string.Empty,
+                Email = person.Email ?? string.Empty,
                 Token = token
             };
         }
 
-        public static LitePersonDto ToLightPersonDto(this Person person)
+        public static LitePersonDto ToLitePersonDto(this Person person)
         {
             return new LitePersonDto
             {
                 Id = person.Id,
-                Name = person.UserName
+                Name = person.UserName ?? string.Empty
             };
         }
 
@@ -47,8 +47,8 @@ namespace WPFServer.Extensions.Mappers
             return new PrivatePersonDto
             {
                 Id = person.Id,
-                Name = person.UserName,
-                Email = person.Email
+                Name = person.UserName ?? string.Empty,
+                Email = person.Email ?? string.Empty
             };
         }
 
@@ -57,9 +57,8 @@ namespace WPFServer.Extensions.Mappers
             return new FullPersonDto
             {
                 Id = person.Id,
-                Name = person.UserName,
-                Image = person.Files?.Image,
-                Exercises = person.Exercises?.Select(x => x.ToExerciseDto(false)).ToList()
+                Name = person.UserName ??  string.Empty,
+                Image = person.Files.Image ?? []
             };
         }
 
@@ -68,10 +67,9 @@ namespace WPFServer.Extensions.Mappers
             return new FullPrivatePersonDto
             {
                 Id = person.Id,
-                Name = person.UserName,
-                Email = person.Email,
-                Image = person.Files?.Image,
-                Exercises = person.Exercises?.Select(x => x.ToExerciseDto(true)).ToList()
+                Name = person.UserName ??  string.Empty,
+                Email = person.Email ??  string.Empty,
+                Image = person.Files.Image ?? []
             };
         }
     }

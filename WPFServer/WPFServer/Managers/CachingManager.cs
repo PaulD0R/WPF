@@ -1,7 +1,7 @@
 using WPFServer.Interfaces.Managers;
 using WPFServer.Interfaces.Services;
 
-namespace WPFServer.Services.Caching;
+namespace WPFServer.Managers;
 
 public class CachingManager(
     IStringCachingService @string, IHashCachingService hash, IListCachingService list)

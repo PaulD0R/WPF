@@ -9,8 +9,8 @@ namespace WPFServer.Extensions.Mappers
         {
             return new Comment 
             {
-                UserName = person.UserName,
-                Text = request.Text,
+                UserName = person.UserName ??  string.Empty,
+                Text = request.Text ??  string.Empty,
                 Date = DateTime.UtcNow,
                 PersonId = person.Id,
                 ExerciseId = exerciseId
@@ -24,12 +24,12 @@ namespace WPFServer.Extensions.Mappers
                 Id = comment.Id,
                 UserName = comment.UserName,
                 Text = comment.Text,
-                Date = comment.Date.Value.ToString("dd.MM.yyyy"),
+                Date = comment.Date.ToString("dd.MM.yyyy"),
                 IsPerson = comment.PersonId == personId
             };
         }
 
-        public static LiteCommentDto ToLightCommentDto(this Comment comment)
+        public static LiteCommentDto ToLiteCommentDto(this Comment comment)
         {
             return new LiteCommentDto
             {

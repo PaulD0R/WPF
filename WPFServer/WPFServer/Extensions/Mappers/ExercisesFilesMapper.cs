@@ -7,16 +7,16 @@ namespace WPFServer.Extensions.Mappers
     {
         public static ExercisesFiles ToExercisesFiles(this ExercisesFilesRequest request)
         {
-            return new ExercisesFiles()
+            return new ExercisesFiles
             {
-                TasksFile = request.TasksFile
+                TasksFile = request.TasksFile ?? []
             };
         }
 
         public static ExercisesFilesDto ToExercisesFilesDto(this ExercisesFiles request) {
-            return new ExercisesFilesDto()
+            return new ExercisesFilesDto
             {
-                TasksFile =request.TasksFile
+                TasksFile = request.TasksFile 
             };
         }
     }

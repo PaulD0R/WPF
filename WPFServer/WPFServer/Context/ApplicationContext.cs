@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using WPFServer.Data;
 using WPFServer.Models;
 
 namespace WPFServer.Context
@@ -25,12 +24,6 @@ namespace WPFServer.Context
         public ApplicationContext()
         {
 
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            //options.UseSqlServer(StaticData.CONNECTION_STRING);
-            options.UseMySQL(StaticData.CONNECTION_STRING); 
         }
 
         protected override void OnModelCreating(ModelBuilder builder)

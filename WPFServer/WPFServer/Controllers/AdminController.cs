@@ -1,69 +1,53 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WPFServer.DTOs.Person;
-using WPFServer.Extensions.Mappers;
-using WPFServer.Interfaces;
+using WPFServer.Interfaces.Services;
 
 namespace WPFServer.Controllers
 {
     [ApiController]
     [Route("WPF/Admin")]
     [Authorize(Roles = "Admin")]
-    public class AdminController : ControllerBase
+    public class AdminController(IAdminService adminService) : ControllerBase
     {
-        private readonly IAdminRepository _adminRepository;
-        public AdminController(IAdminRepository adminRepository)
-        {
-            _adminRepository = adminRepository;
-        }
-
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAllPersons()
         {
-            var persons = await _adminRepository.GetAllUsersAsync();
-            return Ok(persons.Select(x => x.ToPrivatePersonDto()));
+            return Ok(await adminService.GetAllPersonAsync());
         }
 
         [HttpGet("{userId}/Comments")]
         public async Task<IActionResult> GetCommentsByUserId([FromRoute] string userId)
         {
-            var comments = await _adminRepository.GetCommentsByPersonIdAsync(userId);
-
-            return Ok(comments?.Select(x => x.ToLightCommentDto()));
+            return Ok(await adminService.GetCommentsAsync(userId));
         }
 
-        [HttpPut("{userId}/ChangeRole")]
-        public async Task<IActionResult> ChangeRole([FromRoute] string userId, [FromBody] RoleRequestcs role)
+        [HttpPatch("{userId}/ChangeRole")]
+        public async Task<IActionResult> ChangeRole([FromRoute] string userId, [FromBody] RoleRequest role)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState.Values.First().Errors.First().ErrorMessage);
-
-            if (await _adminRepository.ChangeRoleAsync(userId, role.Role)) return Ok();
-
-            return BadRequest("Ошибка смены роли");
+            await adminService.ChangeRoleAsync(userId, role);
+            return NoContent();
         }
 
-        [HttpPut("{userId}")]
+        [HttpPatch("{userId}")]
         public async Task<IActionResult> UpdateUser([FromRoute] string userId, [FromBody] UpdatePersonRequest newPerson)
         {
-            var person = await _adminRepository.ChangeUserAsync(userId, newPerson.ToPerson());
-
-            return Ok(person?.ToLightPersonDto());
+            await adminService.UpdatePersonAsync(userId, newPerson);
+            return NoContent();
         }
 
         [HttpDelete("{userId}")]
         public async Task<IActionResult> DeletePerson([FromRoute] string userId)
         {
-            if (await _adminRepository.DeleteUserAsync(userId)) return NoContent();
-
-            return BadRequest("Ошибка удаления");
+            await adminService.DeletePersonAsync(userId);
+            return NoContent();
         }
 
         [HttpDelete("Comments/{commentId:int}")]
         public async Task<IActionResult> DeleteComment([FromRoute] int commentId)
         {
-            if (await _adminRepository.DeleteCommentAsync(commentId)) return NoContent();
-
-            return BadRequest("Ошибка удаления");
+            await adminService.DeleteCommentAsync(commentId);
+            return NoContent();
         }
     }
 }

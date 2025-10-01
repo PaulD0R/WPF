@@ -2,8 +2,8 @@
 {
     public class LiteCommentDto
     {
-        public int? Id { get; set; }
-        public string? PersonId { get; set; }
-        public string? Text { get; set; }
+        public int Id { get; set; }
+        public string PersonId { get; set; } = null!;
+        public string Text { get; set; } = null!;
     }
 }

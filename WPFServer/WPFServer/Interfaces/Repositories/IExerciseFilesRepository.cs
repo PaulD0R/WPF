@@ -1,6 +1,8 @@
+using WPFServer.Models;
+
 namespace WPFServer.Interfaces.Repositories;
 
-public class IExerciseFilesRepository
+public interface IExerciseFilesRepository
 {
-    
+    Task<ExercisesFiles?> GetTasksFileByIdAsync(int id);
 }
