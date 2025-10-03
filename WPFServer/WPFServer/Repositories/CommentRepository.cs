@@ -22,11 +22,22 @@ namespace WPFServer.Repositories
             }
         }
 
-        public async Task<bool> DeleteByIdAsync(int id, string personId)
+        public async Task<bool> DeletePersonCommentByIdAsync(int id, string personId)
         {
             var comment = await context.Comments
                 .FirstOrDefaultAsync(x => x.Id == id &&  x.PersonId == personId);
 
+            if (comment == null) return false;
+
+            context.Comments.Remove(comment);
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> DeleteCommentByIdAsync(int id)
+        {
+            var comment = await context.Comments.FirstOrDefaultAsync(x => x.Id == id);
             if (comment == null) return false;
 
             context.Comments.Remove(comment);

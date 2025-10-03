@@ -23,7 +23,7 @@ public class AuthenticationService(
         if (person == null) throw new BadRequestException("Person with this name not found");
         
         var result = await signInManager.CheckPasswordSignInAsync(person, signinRequest.Password!, false);
-        if (!result.Succeeded) throw new Exception("Неверный пароль");
+        if (!result.Succeeded) throw new Exception("Incorrect password");
 
         var token = await jwtRepository.CreateJwtAsync(person);
         var refreshToken = await refreshTokenRepository.CreateNewRefreshTokenAsync(person);
@@ -41,11 +41,11 @@ public class AuthenticationService(
         var createPerson = await userManager.CreateAsync(person, newPersonRequest.Password!);
 
         if (!createPerson.Succeeded)
-            throw new UsernameAlreadyExistsException(person.UserName ?? "");
+            throw new UsernameAlreadyExistsException(person.UserName!);
             
         var roleResult = await userManager.AddToRoleAsync(person, "User");
         if (!roleResult.Succeeded)
-            throw new Exception("Не удалось выдать права");
+            throw new Exception("failed to issue license");
             
         await personsFilesRepository.CreateNewAsync(person.Id);
 
@@ -56,22 +56,6 @@ public class AuthenticationService(
         {
             Jwt = token,
             RefreshToken = refreshToken
-        };
-    }
-
-    public async Task<TokensDto> RefreshTokenAsync(RefreshTokenRequest refreshTokenRequest)
-    {
-        var refreshToken = await refreshTokenRepository.GetRefreshTokenByTokenAsync(refreshTokenRequest.Token!);
-        if (refreshToken == null || refreshToken.LiveTime < DateTime.UtcNow)
-            throw new BadRequestException("Not correct token");
-        
-        var jwtToken = await jwtRepository.CreateJwtAsync(refreshToken.Person);
-        await refreshTokenRepository.UpdateRefreshToken(refreshToken);
-        
-        return new TokensDto
-        {
-            Jwt = jwtToken,
-            RefreshToken = refreshToken.Token
         };
     }
 

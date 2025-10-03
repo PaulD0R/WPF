@@ -8,7 +8,10 @@ namespace WPFServer.Controllers
 {
     [ApiController]
     [Route("WPF/Authentication")]
-    public class AuthenticationController(IAuthenticationService authorizationService) : ControllerBase
+    public class AuthenticationController(
+        IAuthenticationService authorizationService,
+        ITokenService tokenService)
+        : ControllerBase
     {
         [HttpPost("Signin")]
         public async Task<IActionResult> Signin([FromBody] SigninRequest signinRequest)
@@ -25,7 +28,7 @@ namespace WPFServer.Controllers
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            return Ok(await authorizationService.RefreshTokenAsync(request));
+            return Ok(await tokenService.RefreshTokenAsync(request));
         }
 
         [HttpDelete("Logout")]

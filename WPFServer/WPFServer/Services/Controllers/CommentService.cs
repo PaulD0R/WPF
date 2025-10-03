@@ -47,7 +47,7 @@ public class CommentService(
 
     public async Task<bool> DeleteCommentAsync(int id, string personId)
     {
-        return await commentRepository.DeleteByIdAsync(id, personId)
+        return await commentRepository.DeletePersonCommentByIdAsync(id, personId)
             ? true : throw new NotFoundException($"Comment {id} not found");
     }
 }

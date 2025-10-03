@@ -4,14 +4,18 @@ namespace WPFServer.Interfaces.Repositories
 {
     public interface IPersonRepository
     {
-        public Task<Person?> GetByIdAsync(string id);
-        public Task<Person?> GetByNameAsync(string name);
-        public Task<Person?> GetLiteByIdAsync(string id);
-        public Task<ICollection<Person>> GetByNameSimilarsAsync(string name);
-        public Task<ICollection<Person>> GetAllAsync();
-        public Task<bool?> GetIsLikedByIdAsync(string id, int exerciseId);
-        public Task<bool> AddRoleByIdAsync(string id, string role);
-        public Task<bool> DeleteRoleByIdAsync(string id, string role);
-        public Task<bool> DeleteCommentByIdAsync(string id, int commentId);
+        Task<Person?> GetByIdAsync(string id);
+        Task<Person?> GetByNameAsync(string name);
+        Task<Person?> ChangeUserAsync(string id, Person newPerson);
+        Task<ICollection<Person>> GetAllUsersAsync();
+        Task<Person?> GetLiteByIdAsync(string id);
+        Task<ICollection<Person>> GetByNameSimilarAsync(string name);
+        Task<ICollection<Person>> GetAllAsync();
+        Task<bool> DeleteUserAsync(string id);
+        Task<bool> ChangeRoleAsync(string id, string newRole);
+        Task<bool?> GetIsLikedByIdAsync(string id, int exerciseId);
+        Task<bool> AddRoleByIdAsync(string id, string role);
+        Task<bool> DeleteRoleByIdAsync(string id, string role);
+        Task<bool> DeleteCommentByIdAsync(string id, int commentId);
     }
 }
