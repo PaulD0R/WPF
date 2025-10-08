@@ -7,7 +7,7 @@ namespace WPFServer.Interfaces.Repositories
         Task<Person?> GetByIdAsync(string id);
         Task<Person?> GetByNameAsync(string name);
         Task<Person?> ChangeUserAsync(string id, Person newPerson);
-        Task<ICollection<Person>> GetAllUsersAsync();
+        Task<ICollection<Person>> GetWithoutRoleUsersAsync(string role);
         Task<Person?> GetLiteByIdAsync(string id);
         Task<ICollection<Person>> GetByNameSimilarAsync(string name);
         Task<ICollection<Person>> GetAllAsync();

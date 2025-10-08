@@ -1,5 +1,6 @@
 using WPFServer.DTOs.Exercise;
 using WPFServer.DTOs.ExercisesFiles;
+using WPFServer.DTOs.Helpers;
 using WPFServer.Exceptions;
 using WPFServer.Extensions.Mappers;
 using WPFServer.Interfaces.Repositories;
@@ -16,6 +17,24 @@ public class ExerciseService(
     public async Task<ICollection<ExerciseDto>> GetAllAsync(string personId)
     {
         var exercises = await exerciseRepository.GetAllAsync();
+        return exercises.Select(e => e.ToExerciseDto(personId)).ToList();
+    }
+
+    public async Task<ICollection<ExerciseDto>> GetAllWithFiltersAsync(string personId, ExerciseHelper helper)
+    {
+        var exercises = await exerciseRepository.GetAllAsync();
+        
+        if (helper.Numbers != null)
+            exercises = exercises.Where(x => helper.Numbers.Contains(x.Number)).ToList();
+        if (helper.SubjectsId != null)
+            exercises = exercises.Where(x => helper.SubjectsId.Contains(x.SubjectId)).ToList();
+        
+        exercises = helper.SortedBy.ToLower() switch
+        {
+            "number" => exercises.OrderBy(e => e.Number).ToList(),
+            _ => exercises
+        };
+        
         return exercises.Select(e => e.ToExerciseDto(personId)).ToList();
     }
 

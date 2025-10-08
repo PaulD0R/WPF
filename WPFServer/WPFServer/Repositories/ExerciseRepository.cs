@@ -61,18 +61,6 @@ namespace WPFServer.Repositories
             return await context.Exercises.CountAsync();
         }
 
-        public ICollection<Exercise> GetByPage(int pageNumber)
-        {
-            return context.Exercises.Include(x => x.Subject)
-                .Skip((pageNumber - 1) * StaticData.NUMBER_OF_ELEMENTS_PER_PAGE)
-                .Take(StaticData.NUMBER_OF_ELEMENTS_PER_PAGE).ToList();
-        }
-
-        public int GetLength()
-        {
-            return context.Exercises.Count();
-        }
-
         public async Task<bool> AddAsync(Exercise exercise)
         {
             try

@@ -1,28 +1,40 @@
-﻿version: '3.8'
+﻿version: "3.9"
 
 services:
-  first-wpf-server:
-    container_name: "first-wpf-server"
+  web:
+    build:
+      context: .
+      dockerfile: MyApp/Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=wpf_db;Username=wpf_user;Password=asdfgh67;
+      - Redis__Configuration=redis:6379
     depends_on:
       - db
-    environment:
-      - DB_HOST=localhost
-      - DB_PORT=5432
-      - DB_USER=postgres
-      - DB_PASSWORD=asdfgh67
-      - DB_NAME=wpf_db
+      - redis
 
   db:
-    image: postgres:latest
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER=wpf_user
+      - POSTGRES_PASSWORD=asdfgh67
+      - POSTGRES_DB=wpf_db
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: asdfgh67
-      POSTGRES_DB: wpf_db
     volumes:
       - db_data:/var/lib/postgresql/data
-    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
 
 volumes:
   db_data:
+  redis_data:

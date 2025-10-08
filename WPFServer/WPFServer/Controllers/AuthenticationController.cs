@@ -35,10 +35,10 @@ namespace WPFServer.Controllers
         [Authorize]
         public async Task<IActionResult> Logout()
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            await authorizationService.LogoutAsync(id);
+            await authorizationService.LogoutAsync(personId);
             return NoContent();
         }
     }

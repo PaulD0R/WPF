@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using WPFServer.DTOs.Comment;
 using WPFServer.DTOs.Exercise;
+using WPFServer.DTOs.Helpers;
 using WPFServer.Extensions;
 using WPFServer.Interfaces.Services;
 
@@ -18,12 +19,12 @@ namespace WPFServer.Controllers
         : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ExerciseHelper helper)
         {
             var personId = User.GetId();
             if (personId == null) return Unauthorized("Не авторизирован");
             
-            return Ok(await exerciseService.GetAllAsync(personId));
+            return Ok(await exerciseService.GetAllWithFiltersAsync(personId, helper));
         }
 
         [HttpGet("Count")]

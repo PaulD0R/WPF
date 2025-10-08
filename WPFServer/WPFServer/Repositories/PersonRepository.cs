@@ -83,9 +83,9 @@ namespace WPFServer.Repositories
             return person;
         }
 
-        public async Task<ICollection<Person>> GetAllUsersAsync()
+        public async Task<ICollection<Person>> GetWithoutRoleUsersAsync(string role)
         {
-            var admins = await userManager.GetUsersInRoleAsync("Admin");
+            var admins = await userManager.GetUsersInRoleAsync("role");
             var persons = await userManager.Users.ToListAsync();
 
             return persons.Except(admins).ToList();

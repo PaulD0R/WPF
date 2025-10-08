@@ -16,7 +16,7 @@ public class AdminService(
 {
     public async Task<ICollection<PrivatePersonDto>> GetAllPersonAsync()
     {
-        var persons = await personRepository.GetAllUsersAsync();
+        var persons = await personRepository.GetWithoutRoleUsersAsync("Admin");
         return persons.Select(p => p.ToPrivatePersonDto()).ToList();
     }
 
@@ -24,7 +24,7 @@ public class AdminService(
     {
         var comments = await commentRepository.GetCommentsByPersonIdAsync(id);
         return comments?.Select(c => c.ToLiteCommentDto()).ToList() ?? 
-               throw new NotFoundException("No comments found");
+               throw new NotFoundException("No one comment found");
     }
 
     public async Task<bool> ChangeRoleAsync(string id, RoleRequest role)

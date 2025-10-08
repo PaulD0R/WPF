@@ -35,57 +35,57 @@ namespace WPFServer.Controllers
         [HttpGet("Me")]
         public async Task<IActionResult> GetPrivatePerson()
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            return Ok(await personService.GetMeAsync(id));
+            return Ok(await personService.GetMeAsync(personId));
         }
 
         [HttpGet("Me/IsLiked/{exerciseId:int}")]
         public async Task<IActionResult> GetIsLiked([FromRoute] int exerciseId)
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            return Ok(new { IsLiked = await personService.IsLikedAsync(id, exerciseId) });
+            return Ok(new { IsLiked = await personService.IsLikedAsync(personId, exerciseId) });
         }
 
         [HttpPut("Me/Image/Change")]
         public async Task<IActionResult> ChangePrivateImage([FromBody] NewPersonsImageRequest newImage)
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            await personService.ChangeImageAsync(id, newImage);
+            await personService.ChangeImageAsync(personId, newImage);
             return NoContent();
         }
 
         [HttpDelete("Me/Image/Delete")]
         public async Task<IActionResult> DeletePrivateImage()
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            await personService.ChangeImageAsync(id);
+            await personService.ChangeImageAsync(personId);
             return NoContent();
         }
 
         [HttpGet("Me/Comments")]
         public async Task<IActionResult> GetComments()
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
 
-            return Ok(await commentService.GetCommentsByPersonIdAsync(id));
+            return Ok(await commentService.GetCommentsByPersonIdAsync(personId));
         }
 
         [HttpDelete("Me/Comments/Delete/{commentId:int}")]
         public async Task<IActionResult> DeleteComment([FromRoute] int commentId)
         {
-            var id = User.GetId();
-            if (id == null) return Unauthorized("Не авторизирован");
+            var personId = User.GetId();
+            if (personId == null) return Unauthorized("Не авторизирован");
             
-            await commentService.DeleteCommentAsync(commentId, id);
+            await commentService.DeleteCommentAsync(commentId, personId);
             return NoContent();
         }
     }
