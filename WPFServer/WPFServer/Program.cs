@@ -29,15 +29,15 @@ builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
     options.SuppressModelStateInvalidFilter = true;
 });
 builder.Services.AddDbContext<ApplicationContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 {
-    var configuration = builder.Configuration.GetConnectionString("Redis");
+    var configuration = builder.Configuration.GetConnectionString("RedisConnection");
     return ConnectionMultiplexer.Connect(configuration ?? "localhost");
 });
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.Configuration = builder.Configuration.GetConnectionString("RedisConnection");
     options.InstanceName = "WPF";
 });
 builder.Services.AddIdentity<Person, IdentityRole>( options =>
@@ -101,6 +101,7 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IExerciseService, ExerciseService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddCors(options =>
 {
@@ -126,7 +127,6 @@ builder.WebHost.ConfigureKestrel(options =>
 
 var app = builder.Build();
 
-app.UseExceptionHandler();
 app.UseStatusCodePages(async statusCodeContext =>
 {
     var response = statusCodeContext.HttpContext.Response;
@@ -143,7 +143,6 @@ app.UseStatusCodePages(async statusCodeContext =>
 });
 
 app.UseExceptionHandler();
-
 app.UseResponseCompression();
 app.UseHttpsRedirection();
 app.UseRouting();

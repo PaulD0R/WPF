@@ -20,27 +20,30 @@ public class ExerciseService(
         return exercises.Select(e => e.ToExerciseDto(personId)).ToList();
     }
 
-    public async Task<ICollection<ExerciseDto>> GetAllWithFiltersAsync(string personId, ExerciseHelper helper)
+    public async Task<ICollection<ExerciseDto>> GetAllWithFiltersAsync(string personId)
     {
         var exercises = await exerciseRepository.GetAllAsync();
+        return exercises.Select(e => e.ToExerciseDto(personId)).ToList();
+    }
+
+    public async Task<ICollection<ExerciseDto>> GetByPageAsync(int page, string personId, ExerciseHelper helper)
+    {
+        var exercises = await exerciseRepository.GetByPageAsync(page);
         
         if (helper.Numbers != null)
             exercises = exercises.Where(x => helper.Numbers.Contains(x.Number)).ToList();
         if (helper.SubjectsId != null)
             exercises = exercises.Where(x => helper.SubjectsId.Contains(x.SubjectId)).ToList();
-        
-        exercises = helper.SortedBy.ToLower() switch
-        {
-            "number" => exercises.OrderBy(e => e.Number).ToList(),
-            _ => exercises
-        };
-        
-        return exercises.Select(e => e.ToExerciseDto(personId)).ToList();
-    }
 
-    public async Task<ICollection<ExerciseDto>> GetByPageAsync(int page, string personId)
-    {
-        var exercises = await exerciseRepository.GetByPageAsync(page);
+        if (!string.IsNullOrEmpty(helper.SortedBy))
+        {
+            exercises = helper.SortedBy.ToLower() switch
+            {
+                "number" => exercises.OrderBy(e => e.Number).ToList(),
+                _ => exercises
+            };
+        }
+        
         return exercises.Select(e => e.ToExerciseDto(personId)).ToList();
     }
 

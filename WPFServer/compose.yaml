@@ -1,40 +1,36 @@
-﻿version: "3.9"
-
-services:
-  web:
-    build:
-      context: .
-      dockerfile: MyApp/Dockerfile
-    ports:
-      - "5000:8080"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=wpf_db;Username=wpf_user;Password=asdfgh67;
-      - Redis__Configuration=redis:6379
-    depends_on:
-      - db
-      - redis
-
-  db:
-    image: postgres:16
-    restart: always
-    environment:
-      - POSTGRES_USER=wpf_user
-      - POSTGRES_PASSWORD=asdfgh67
-      - POSTGRES_DB=wpf_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
-
+﻿services:
   redis:
-    image: redis:7
-    restart: always
+    image: redis:latest
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis-data:/data
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: wpf_user
+      POSTGRES_PASSWORD: asdfgh67
+      POSTGRES_DB: wpf_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./DataBase/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  web:
+    build:
+      dockerfile: WPFServer/Dockerfile
+    depends_on:
+      - db
+      - redis  
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__PostgresConnection: "Host=db;Port=5432;Database=wpf_db;Username=wpf_user;Password=asdfgh67"
+      ConnectionStrings__RedisConnection: "redis:6379"
+    ports:
+      - "8080:8080"
 
 volumes:
-  db_data:
-  redis_data:
+  pg-data:
+  redis-data:

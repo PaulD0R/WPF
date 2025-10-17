@@ -7,8 +7,8 @@ namespace WPFServer.Interfaces.Services;
 public interface IExerciseService
 {
     Task<ICollection<ExerciseDto>> GetAllAsync(string personId);
-    Task<ICollection<ExerciseDto>> GetAllWithFiltersAsync(string personId, ExerciseHelper helper);
-    Task<ICollection<ExerciseDto>> GetByPageAsync(int page, string personId);
+    Task<ICollection<ExerciseDto>> GetAllWithFiltersAsync(string personId);
+    Task<ICollection<ExerciseDto>> GetByPageAsync(int page, string personId, ExerciseHelper helper);
     Task<ICollection<ExerciseDto>> GetExercisesByPersonIdAsync(string personId);
     Task<ICollection<ExerciseDto>> GetExercisesBySubjectAsync(int subjectId, string personId);
     Task<ExercisesFilesDto> GetTaskAsync(int id);

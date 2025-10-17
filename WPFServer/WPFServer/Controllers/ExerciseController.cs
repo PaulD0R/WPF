@@ -19,12 +19,12 @@ namespace WPFServer.Controllers
         : ControllerBase
     {
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromQuery] ExerciseHelper helper)
+        public async Task<IActionResult> GetAll()
         {
             var personId = User.GetId();
             if (personId == null) return Unauthorized("Не авторизирован");
             
-            return Ok(await exerciseService.GetAllWithFiltersAsync(personId, helper));
+            return Ok(await exerciseService.GetAllWithFiltersAsync(personId));
         }
 
         [HttpGet("Count")]
@@ -34,12 +34,12 @@ namespace WPFServer.Controllers
         }
 
         [HttpGet("Page{page:int}")]
-        public async Task<IActionResult> GetByPage([FromRoute] int page)
+        public async Task<IActionResult> GetByPage([FromRoute] int page, [FromQuery] ExerciseHelper helper)
         {
             var personId = User.GetId();
             if (personId == null) return Unauthorized("Не авторизирован");
 
-            return Ok(await exerciseService.GetByPageAsync(page, personId));
+            return Ok(await exerciseService.GetByPageAsync(page, personId, helper));
         }
 
         [HttpGet("{id:int}/File/Task")]

@@ -36,14 +36,14 @@ namespace WPFServer.Context
 
             List<IdentityRole> roles =
             [
-                new IdentityRole
+                new()
                 {   
                     Id = Guid.Parse(ADMIN_ID).ToString(),
                     Name = "Admin",
                     NormalizedName = "ADMIN"
                 },
 
-                new IdentityRole
+                new()
                 {
                     Id = Guid.Parse(USER_ID).ToString(),
                     Name = "User",

@@ -264,20 +264,26 @@ namespace WPFServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("Date")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("ExerciseId")
+                    b.Property<int>("ExerciseId")
                         .HasColumnType("integer");
 
                     b.Property<string>("PersonId")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(38)
+                        .HasColumnType("character varying(38)");
 
                     b.Property<string>("Text")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
 
                     b.HasKey("Id");
 
@@ -296,14 +302,16 @@ namespace WPFServer.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Number")
+                    b.Property<int>("Number")
                         .HasColumnType("integer");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Task")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.HasKey("Id");
 
@@ -324,6 +332,7 @@ namespace WPFServer.Migrations
                         .HasColumnType("integer");
 
                     b.Property<byte[]>("TasksFile")
+                        .IsRequired()
                         .HasColumnType("bytea");
 
                     b.HasKey("Id");
@@ -346,7 +355,9 @@ namespace WPFServer.Migrations
                         .HasColumnType("bytea");
 
                     b.Property<string>("PersonId")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(38)
+                        .HasColumnType("character varying(38)");
 
                     b.HasKey("Id");
 
@@ -359,16 +370,21 @@ namespace WPFServer.Migrations
             modelBuilder.Entity("WPFServer.Models.RefreshToken", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasMaxLength(38)
+                        .HasColumnType("character varying(38)");
 
                     b.Property<DateTime>("LiveTime")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("PersonId")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(38)
+                        .HasColumnType("character varying(38)");
 
                     b.Property<string>("Token")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.HasKey("Id");
 
@@ -389,12 +405,16 @@ namespace WPFServer.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
 
-                    b.Property<int?>("Year")
+                    b.Property<int>("Year")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -482,11 +502,15 @@ namespace WPFServer.Migrations
                 {
                     b.HasOne("WPFServer.Models.Exercise", "Exercise")
                         .WithMany("Comments")
-                        .HasForeignKey("ExerciseId");
+                        .HasForeignKey("ExerciseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("WPFServer.Models.Person", "Person")
                         .WithMany("Comments")
-                        .HasForeignKey("PersonId");
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Exercise");
 
@@ -519,7 +543,9 @@ namespace WPFServer.Migrations
                 {
                     b.HasOne("WPFServer.Models.Person", "Person")
                         .WithOne("Files")
-                        .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId");
+                        .HasForeignKey("WPFServer.Models.PersonsFiles", "PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Person");
                 });
@@ -528,7 +554,9 @@ namespace WPFServer.Migrations
                 {
                     b.HasOne("WPFServer.Models.Person", "Person")
                         .WithMany()
-                        .HasForeignKey("PersonId");
+                        .HasForeignKey("PersonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Person");
                 });
@@ -537,7 +565,8 @@ namespace WPFServer.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("ExercisesFiles");
+                    b.Navigation("ExercisesFiles")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("WPFServer.Models.Subject", b =>
@@ -549,7 +578,8 @@ namespace WPFServer.Migrations
                 {
                     b.Navigation("Comments");
 
-                    b.Navigation("Files");
+                    b.Navigation("Files")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

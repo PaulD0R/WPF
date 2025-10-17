@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace WPFServer.Migrations
 {
     /// <inheritdoc />
-    public partial class change_owner : Migration
+    public partial class fordocker : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,9 +60,9 @@ namespace WPFServer.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Year = table.Column<int>(type: "integer", nullable: true),
-                    Description = table.Column<string>(type: "text", nullable: true)
+                    Name = table.Column<string>(type: "character varying(40)", maxLength: 40, nullable: false),
+                    Year = table.Column<int>(type: "integer", nullable: false),
+                    Description = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -182,7 +182,7 @@ namespace WPFServer.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Image = table.Column<byte[]>(type: "bytea", nullable: true),
-                    PersonId = table.Column<string>(type: "text", nullable: true)
+                    PersonId = table.Column<string>(type: "character varying(38)", maxLength: 38, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -191,17 +191,18 @@ namespace WPFServer.Migrations
                         name: "FK_PersonsFiles_AspNetUsers_PersonId",
                         column: x => x.PersonId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "RefreshTokens",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    Token = table.Column<string>(type: "text", nullable: true),
+                    Id = table.Column<string>(type: "character varying(38)", maxLength: 38, nullable: false),
+                    Token = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     LiveTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    PersonId = table.Column<string>(type: "text", nullable: true)
+                    PersonId = table.Column<string>(type: "character varying(38)", maxLength: 38, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -210,7 +211,8 @@ namespace WPFServer.Migrations
                         name: "FK_RefreshTokens_AspNetUsers_PersonId",
                         column: x => x.PersonId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -219,8 +221,8 @@ namespace WPFServer.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Number = table.Column<int>(type: "integer", nullable: true),
-                    Task = table.Column<string>(type: "text", nullable: true),
+                    Number = table.Column<int>(type: "integer", nullable: false),
+                    Task = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     SubjectId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -240,11 +242,11 @@ namespace WPFServer.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserName = table.Column<string>(type: "text", nullable: true),
-                    Text = table.Column<string>(type: "text", nullable: true),
-                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    PersonId = table.Column<string>(type: "text", nullable: true),
-                    ExerciseId = table.Column<int>(type: "integer", nullable: true)
+                    UserName = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
+                    Text = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    PersonId = table.Column<string>(type: "character varying(38)", maxLength: 38, nullable: false),
+                    ExerciseId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -253,12 +255,14 @@ namespace WPFServer.Migrations
                         name: "FK_Comments_AspNetUsers_PersonId",
                         column: x => x.PersonId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Comments_Exercises_ExerciseId",
                         column: x => x.ExerciseId,
                         principalTable: "Exercises",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -291,7 +295,7 @@ namespace WPFServer.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    TasksFile = table.Column<byte[]>(type: "bytea", nullable: true),
+                    TasksFile = table.Column<byte[]>(type: "bytea", nullable: false),
                     ExerciseId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
